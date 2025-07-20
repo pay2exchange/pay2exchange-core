@@ -1,5 +1,9 @@
-BitShares Core
-==============
+Pay2Exchange (based on BitShares Core)
+======================================
+
+This project is a separate blockchain, based on source code forked from BitShares.
+Elsewhere in the docs and code comments we still might use the original name "BitShares" (to reduce diff size between projects), at least for now.
+This code is very experimental and should not be used in production.
 
 [BitShares Core](https://github.com/bitshares/bitshares-core) is the BitShares blockchain node software and command-line wallet software.
 For UI reference wallet software (browser-based wallet and desktop wallet) visit [BitShares UI](https://github.com/bitshares/bitshares-ui).

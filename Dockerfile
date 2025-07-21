@@ -8,31 +8,31 @@ RUN \
     apt-get upgrade -y -o Dpkg::Options::="--force-confold" && \
     apt-get update && \
     apt-get install -y \
-    g++ \
-    autoconf \
-    cmake \
-    git \
-    libbz2-dev \
-    libcurl4-openssl-dev \
-    libssl-dev \
-    libncurses-dev \
-    libboost-thread-dev \
-    libboost-iostreams-dev \
-    libboost-date-time-dev \
-    libboost-system-dev \
-    libboost-filesystem-dev \
-    libboost-program-options-dev \
-    libboost-chrono-dev \
-    libboost-test-dev \
-    libboost-context-dev \
-    libboost-regex-dev \
-    libboost-coroutine-dev \
-    liblzma-dev \
-    libzstd-dev \
-    libz-dev \
-    libtool \
-    doxygen \
-    ca-certificates \
+			g++ \
+			autoconf \
+			cmake \
+			git \
+			libbz2-dev \
+			libcurl4-openssl-dev \
+			libssl-dev \
+			libncurses-dev \
+			libboost-thread-dev \
+			libboost-iostreams-dev \
+			libboost-date-time-dev \
+			libboost-system-dev \
+			libboost-filesystem-dev \
+			libboost-program-options-dev \
+			libboost-chrono-dev \
+			libboost-test-dev \
+			libboost-context-dev \
+			libboost-regex-dev \
+			libboost-coroutine-dev \
+			liblzma-dev \
+			libzstd-dev \
+			libz-dev \
+			libtool \
+			doxygen \
+			ca-certificates \
     && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

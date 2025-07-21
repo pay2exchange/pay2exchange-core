@@ -54,7 +54,7 @@ jobs:
                        libcurl4-openssl-dev \
                        liblzma-dev \
                        libzstd-dev \
-                       libz-dev \
+                       libz-dev
           sudo apt-get auto-remove -y
           sudo apt-get clean -y
           df -h

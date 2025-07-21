@@ -10,6 +10,7 @@ For UI reference wallet software (browser-based wallet and desktop wallet) visit
 
 Visit [Pay2Exchange.github.io](https://Pay2Exchange.github.io/) to learn about Pay2Exchange and join the community at [Pay2ExchangeTalk.org](https://Pay2Exchangetalk.org/).
 
+
 Information for developers can be found in the [Wiki](https://github.com/pay2exchange/pay2exchange-core/wiki) and the [Pay2Exchange Developer Portal](https://dev.Pay2Exchange.works/). Users interested in how Pay2Exchange works can go to the [Pay2Exchange Documentation](https://how.Pay2Exchange.works/) site.
 
 Visit [Awesome Pay2Exchange](https://github.com/Pay2Exchange/awesome-Pay2Exchange) to find more resources and links E.G. chat groups, client libraries and extended APIs.

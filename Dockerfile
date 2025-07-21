@@ -27,6 +27,9 @@ RUN \
     libboost-context-dev \
     libboost-regex-dev \
     libboost-coroutine-dev \
+    liblzma-dev \
+    libzstd-dev \
+    libz-dev \
     libtool \
     doxygen \
     ca-certificates \

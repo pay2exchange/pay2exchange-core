@@ -1,18 +1,19 @@
-Pay2Exchange (based on BitShares Core)
+Pay2Exchange (based on Pay2Exchange Core)
 ======================================
 
-This project is a separate blockchain, based on source code forked from BitShares.
-Elsewhere in the docs and code comments we still might use the original name "BitShares" (to reduce diff size between projects), at least for now.
+This project is a separate blockchain, based on source code forked from Pay2Exchange.
+Elsewhere in the docs and code comments we still might use the original name "Pay2Exchange" (to reduce diff size between projects), at least for now.
 This code is very experimental and should not be used in production.
 
-[BitShares Core](https://github.com/bitshares/bitshares-core) is the BitShares blockchain node software and command-line wallet software.
-For UI reference wallet software (browser-based wallet and desktop wallet) visit [BitShares UI](https://github.com/bitshares/bitshares-ui).
+[Pay2Exchange Core](https://github.com/pay2exchange/pay2exchange-core) is the Pay2Exchange blockchain node software and command-line wallet software.
+For UI reference wallet software (browser-based wallet and desktop wallet) visit [Pay2Exchange UI](https://github.com/Pay2Exchange/Pay2Exchange-ui).
 
-Visit [BitShares.github.io](https://bitshares.github.io/) to learn about BitShares and join the community at [BitSharesTalk.org](https://bitsharestalk.org/).
+Visit [Pay2Exchange.github.io](https://Pay2Exchange.github.io/) to learn about Pay2Exchange and join the community at [Pay2ExchangeTalk.org](https://Pay2Exchangetalk.org/).
 
-Information for developers can be found in the [Wiki](https://github.com/bitshares/bitshares-core/wiki) and the [BitShares Developer Portal](https://dev.bitshares.works/). Users interested in how BitShares works can go to the [BitShares Documentation](https://how.bitshares.works/) site.
 
-Visit [Awesome BitShares](https://github.com/bitshares/awesome-bitshares) to find more resources and links E.G. chat groups, client libraries and extended APIs.
+Information for developers can be found in the [Wiki](https://github.com/pay2exchange/pay2exchange-core/wiki) and the [Pay2Exchange Developer Portal](https://dev.Pay2Exchange.works/). Users interested in how Pay2Exchange works can go to the [Pay2Exchange Documentation](https://how.Pay2Exchange.works/) site.
+
+Visit [Awesome Pay2Exchange](https://github.com/Pay2Exchange/awesome-Pay2Exchange) to find more resources and links E.G. chat groups, client libraries and extended APIs.
 
 * [Getting Started](#getting-started)
 * [Support](#support)
@@ -23,20 +24,17 @@ Visit [Awesome BitShares](https://github.com/bitshares/awesome-bitshares) to fin
 
 |Branch|Build Status|
 |---|---|
-|`master`|[![](https://github.com/bitshares/bitshares-core/workflows/macOS/badge.svg?branch=master)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A"macOS"+branch%3Amaster) [![](https://github.com/bitshares/bitshares-core/workflows/Ubuntu%20Debug/badge.svg?branch=master)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A"Ubuntu+Debug"+branch%3Amaster) [![](https://github.com/bitshares/bitshares-core/workflows/Ubuntu%20Release/badge.svg?branch=master)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A"Ubuntu+Release"+branch%3Amaster) [![](https://github.com/bitshares/bitshares-core/workflows/Windows%20MinGW64/badge.svg?branch=master)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A"Windows+MinGW64"+branch%3Amaster) [![](https://github.com/bitshares/bitshares-core/workflows/Docker/badge.svg?branch=master)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A%22Docker%22+branch%3Amaster)|
-|`develop`|[![](https://github.com/bitshares/bitshares-core/workflows/macOS/badge.svg?branch=develop)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A"macOS"+branch%3Adevelop) [![](https://github.com/bitshares/bitshares-core/workflows/Ubuntu%20Debug/badge.svg?branch=develop)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A"Ubuntu+Debug"+branch%3Adevelop) [![](https://github.com/bitshares/bitshares-core/workflows/Ubuntu%20Release/badge.svg?branch=develop)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A"Ubuntu+Release"+branch%3Adevelop) [![](https://github.com/bitshares/bitshares-core/workflows/Windows%20MinGW64/badge.svg?branch=develop)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A"Windows+MinGW64"+branch%3Adevelop) [![](https://github.com/bitshares/bitshares-core/workflows/Docker/badge.svg?branch=develop)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A%22Docker%22+branch%3Adevelop)|
-|`hardfork`|[![](https://github.com/bitshares/bitshares-core/workflows/macOS/badge.svg?branch=hardfork)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A"macOS"+branch%3Ahardfork) [![](https://github.com/bitshares/bitshares-core/workflows/Ubuntu%20Debug/badge.svg?branch=hardfork)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A"Ubuntu+Debug"+branch%3Ahardfork) [![](https://github.com/bitshares/bitshares-core/workflows/Ubuntu%20Release/badge.svg?branch=hardfork)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A"Ubuntu+Release"+branch%3Ahardfork) [![](https://github.com/bitshares/bitshares-core/workflows/Windows%20MinGW64/badge.svg?branch=hardfork)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A"Windows+MinGW64"+branch%3Ahardfork) [![](https://github.com/bitshares/bitshares-core/workflows/Docker/badge.svg?branch=hardfork)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A%22Docker%22+branch%3Ahardfork)|
-|`testnet`|[![](https://github.com/bitshares/bitshares-core/workflows/macOS/badge.svg?branch=testnet)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A"macOS"+branch%3Atestnet) [![](https://github.com/bitshares/bitshares-core/workflows/Ubuntu%20Debug/badge.svg?branch=testnet)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A"Ubuntu+Debug"+branch%3Atestnet) [![](https://github.com/bitshares/bitshares-core/workflows/Ubuntu%20Release/badge.svg?branch=testnet)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A"Ubuntu+Release"+branch%3Atestnet) [![](https://github.com/bitshares/bitshares-core/workflows/Windows%20MinGW64/badge.svg?branch=testnet)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A"Windows+MinGW64"+branch%3Atestnet) [![](https://github.com/bitshares/bitshares-core/workflows/Docker/badge.svg?branch=testnet)](https://github.com/bitshares/bitshares-core/actions?query=workflow%3A%22Docker%22+branch%3Atestnet)|
-|`master` of `bitshares-fc`|[![](https://github.com/bitshares/bitshares-fc/workflows/macOS/badge.svg?branch=master)](https://github.com/bitshares/bitshares-fc/actions?query=workflow%3A"macOS"+branch%3Amaster) [![](https://github.com/bitshares/bitshares-fc/workflows/Ubuntu%20Debug/badge.svg?branch=master)](https://github.com/bitshares/bitshares-fc/actions?query=workflow%3A"Ubuntu+Debug"+branch%3Amaster) [![](https://github.com/bitshares/bitshares-fc/workflows/Ubuntu%20Release/badge.svg?branch=master)](https://github.com/bitshares/bitshares-fc/actions?query=workflow%3A"Ubuntu+Release"+branch%3Amaster)|
+|`develop`|[![](https://github.com/pay2exchange/pay2exchange-core/workflows/macOS/badge.svg?branch=develop)](https://github.com/pay2exchange/pay2exchange-core/actions?query=workflow%3A"macOS"+branch%3Adevelop) [![](https://github.com/pay2exchange/pay2exchange-core/workflows/Ubuntu%20Debug/badge.svg?branch=develop)](https://github.com/pay2exchange/pay2exchange-core/actions?query=workflow%3A"Ubuntu+Debug"+branch%3Adevelop) [![](https://github.com/pay2exchange/pay2exchange-core/workflows/Ubuntu%20Release/badge.svg?branch=develop)](https://github.com/pay2exchange/pay2exchange-core/actions?query=workflow%3A"Ubuntu+Release"+branch%3Adevelop) [![](https://github.com/pay2exchange/pay2exchange-core/workflows/Windows%20MinGW64/badge.svg?branch=develop)](https://github.com/pay2exchange/pay2exchange-core/actions?query=workflow%3A"Windows+MinGW64"+branch%3Adevelop) [![](https://github.com/pay2exchange/pay2exchange-core/workflows/Docker/badge.svg?branch=develop)](https://github.com/pay2exchange/pay2exchange-core/actions?query=workflow%3A%22Docker%22+branch%3Adevelop)|
+
 
 
 Getting Started
 ---------------
 
 Build instructions and additional documentation are available in the
-[Wiki](https://github.com/bitshares/bitshares-core/wiki).
+[Wiki](https://github.com/pay2exchange/pay2exchange-core/wiki).
 
-Prebuilt binaries can be found in the [releases page](https://github.com/bitshares/bitshares-core/releases) for download.
+Prebuilt binaries can be found in the [releases page](https://github.com/pay2exchange/pay2exchange-core/releases) for download.
 
 
 ### Installing Node and Command-Line Wallet Software
@@ -50,8 +48,8 @@ We recommend building on Ubuntu 20.04 LTS (64-bit)
 
 **Build Node And Command-Line Wallet:**
 
-    git clone https://github.com/bitshares/bitshares-core.git
-    cd bitshares-core
+    git clone https://github.com/pay2exchange/pay2exchange-core.git
+    cd Pay2Exchange-core
     git checkout master # may substitute "master" with current release tag
     git submodule update --init --recursive
     mkdir build
@@ -61,8 +59,8 @@ We recommend building on Ubuntu 20.04 LTS (64-bit)
 
 **Upgrade Node And Command-Line Wallet:**
 
-    cd bitshares-core
-    git remote set-url origin https://github.com/bitshares/bitshares-core.git
+    cd Pay2Exchange-core
+    git remote set-url origin https://github.com/pay2exchange/pay2exchange-core.git
     git checkout master
     git remote set-head origin --auto
     git pull
@@ -76,22 +74,22 @@ We recommend building on Ubuntu 20.04 LTS (64-bit)
 
 **NOTE:**
 
-* BitShares requires a 64-bit operating system to build, and will not build on a 32-bit OS. Tested operating systems:
+* Pay2Exchange requires a 64-bit operating system to build, and will not build on a 32-bit OS. Tested operating systems:
   * Linux (heavily tested with Ubuntu LTS releases)
   * macOS (various versions)
   * Windows (various versions, Visual Studio and MinGW)
   * OpenBSD (various versions)
 
-* BitShares requires [Boost](https://www.boost.org/) libraries to build, supports version `1.58` to `1.74`.
+* Pay2Exchange requires [Boost](https://www.boost.org/) libraries to build, supports version `1.58` to `1.74`.
 Newer versions may work, but have not been tested.
 If your system came pre-installed with a version of Boost libraries that you do not wish to use, you may
-manually build your preferred version and use it with BitShares by specifying it on the CMake command line.
+manually build your preferred version and use it with Pay2Exchange by specifying it on the CMake command line.
 
   Example: `cmake -DBOOST_ROOT=/path/to/boost ..`
 
-* BitShares requires [OpenSSL](https://www.openssl.org/) libraries to build, supports version `1.0.2` to `1.1.1`.
+* Pay2Exchange requires [OpenSSL](https://www.openssl.org/) libraries to build, supports version `1.0.2` to `1.1.1`.
 If your system came pre-installed with a version of OpenSSL libraries that you do not wish to use, you may
-manually build your preferred version and use it with BitShares by specifying it on the CMake command line.
+manually build your preferred version and use it with Pay2Exchange by specifying it on the CMake command line.
 
   Example: `cmake -DOPENSSL_ROOT_DIR=/path/to/openssl ..`
 
@@ -100,7 +98,7 @@ manually build your preferred version and use it with BitShares by specifying it
 
 **Run Node Software:**
 
-Stay on `bitshares-core/build` directory before you run the below `witness_node` command
+Stay on `Pay2Exchange-core/build` directory before you run the below `witness_node` command
 
     ./programs/witness_node/witness_node
 
@@ -114,7 +112,7 @@ For stopping the node run cleanly, you will need to access the node run terminal
 It's recommended to use linux command [screen](https://help.ubuntu.com/community/Screen) to initiate the node run so you can go back to the node run screen to stop it.
 
 
-**IMPORTANT:** By default the node will start in reduced memory mode by using some of the commands detailed in [Memory reduction for nodes](https://github.com/bitshares/bitshares-core/wiki/Memory-reduction-for-nodes).
+**IMPORTANT:** By default the node will start in reduced memory mode by using some of the commands detailed in [Memory reduction for nodes](https://github.com/pay2exchange/pay2exchange-core/wiki/Memory-reduction-for-nodes).
 In order to run a full node with all the account histories which usually unnecessary, you need to remove `partial-operations` and `max-ops-per-account` from your config file. Please note that currently(2018-10-17) a full node will need more than 160GB of RAM to operate and required memory is growing fast. Consider the following table as **minimal requirements** before running a node:
 
 | Default | Full | Minimal  | ElasticSearch
@@ -138,7 +136,7 @@ You can run the program with `--help` parameter to see more info:
 
 ### Using Command-Line Wallet
 
-Stay on `bitshares-core/build` directory before you run the below `cli_wallet` command
+Stay on `Pay2Exchange-core/build` directory before you run the below `cli_wallet` command
 
     ./programs/cli_wallet/cli_wallet
 
@@ -194,28 +192,28 @@ Use `gethelp <COMMAND>` to see more info about individual commands. E.G.
     >>> gethelp get_order_book
 
 The definition of all commands is available in the
-[wallet.hpp](https://github.com/bitshares/bitshares-core/blob/master/libraries/wallet/include/graphene/wallet/wallet.hpp) source code file.
-Corresponding documentation can be found in the [Doxygen documentation](https://bitshares.github.io/doxygen/classgraphene_1_1wallet_1_1wallet__api.html).
+[wallet.hpp](https://github.com/pay2exchange/pay2exchange-core/blob/master/libraries/wallet/include/graphene/wallet/wallet.hpp) source code file.
+Corresponding documentation can be found in the [Doxygen documentation](https://Pay2Exchange.github.io/doxygen/classgraphene_1_1wallet_1_1wallet__api.html).
 
 You can run the program with `--help` parameter to see more info:
 
     ./programs/cli_wallet/cli_wallet --help
 
-There is also some info in the [Wiki](https://github.com/bitshares/bitshares-core/wiki/CLI-Wallet-Cookbook).
+There is also some info in the [Wiki](https://github.com/pay2exchange/pay2exchange-core/wiki/CLI-Wallet-Cookbook).
 
 
 Support
 -------
 
-Technical support is available in the [BitSharesTalk technical support subforum](https://bitsharestalk.org/index.php?board=45.0).
+Technical support is available in the [Pay2ExchangeTalk technical support subforum](https://Pay2Exchangetalk.org/index.php?board=45.0).
 
-BitShares Core bugs can be reported directly to the [issue tracker](https://github.com/bitshares/bitshares-core/issues).
+Pay2Exchange Core bugs can be reported directly to the [issue tracker](https://github.com/pay2exchange/pay2exchange-core/issues).
 
-Questions can be posted in [Github Discussions](https://github.com/bitshares/bitshares-core/discussions).
+Questions can be posted in [Github Discussions](https://github.com/pay2exchange/pay2exchange-core/discussions).
 
-BitShares UI bugs should be reported to the [UI issue tracker](https://github.com/bitshares/bitshares-ui/issues).
+Pay2Exchange UI bugs should be reported to the [UI issue tracker](https://github.com/Pay2Exchange/Pay2Exchange-ui/issues).
 
-Up to date online Doxygen documentation can be found at [https://bitshares.github.io/doxygen](https://bitshares.github.io/doxygen/hierarchy.html).
+Up to date online Doxygen documentation can be found at [https://Pay2Exchange.github.io/doxygen](https://Pay2Exchange.github.io/doxygen/hierarchy.html).
 
 
 Using Built-In APIs
@@ -247,11 +245,11 @@ When using an HTTP client, the API set ID can be replaced by the API set name, E
     $ curl --data '{"jsonrpc": "2.0", "method": "call", "params": ["database", "get_accounts", [["1.2.0"]]], "id": 1}' http://127.0.0.1:8090/
 
 The definition of all node APIs is available in the source code files including
-[database_api.hpp](https://github.com/bitshares/bitshares-core/blob/master/libraries/app/include/graphene/app/database_api.hpp)
-and [api.hpp](https://github.com/bitshares/bitshares-core/blob/master/libraries/app/include/graphene/app/api.hpp).
+[database_api.hpp](https://github.com/pay2exchange/pay2exchange-core/blob/master/libraries/app/include/graphene/app/database_api.hpp)
+and [api.hpp](https://github.com/pay2exchange/pay2exchange-core/blob/master/libraries/app/include/graphene/app/api.hpp).
 Corresponding documentation can be found in Doxygen:
-* [database API](https://bitshares.github.io/doxygen/classgraphene_1_1app_1_1database__api.html)
-* [other APIs](https://bitshares.github.io/doxygen/namespacegraphene_1_1app.html)
+* [database API](https://Pay2Exchange.github.io/doxygen/classgraphene_1_1app_1_1database__api.html)
+* [other APIs](https://Pay2Exchange.github.io/doxygen/namespacegraphene_1_1app.html)
 
 
 ### Wallet API
@@ -307,7 +305,7 @@ necessary to use the node:
 Note: the `login` API set is always accessible.
 
 Passwords are stored in `base64` as salted `sha256` hashes.  A simple Python script,
-[`saltpass.py`](https://github.com/bitshares/bitshares-core/blob/master/programs/witness_node/saltpass.py)
+[`saltpass.py`](https://github.com/pay2exchange/pay2exchange-core/blob/master/programs/witness_node/saltpass.py)
 is available to obtain hash and salt values from a password.
 A single asterisk `"*"` may be specified as username or password hash to accept any value.
 
@@ -324,8 +322,8 @@ The restricted API sets are accessible via HTTP too using *basic access authenti
     $ curl --data '{"jsonrpc": "2.0", "method": "call", "params": ["network_node", "add_node", ["127.0.0.1:9090"]], "id": 1}' http://bytemaster:supersecret@127.0.0.1:8090/
 
 Our `doxygen` documentation contains the most up-to-date information
-about APIs for the [node](https://bitshares.github.io/doxygen/namespacegraphene_1_1app.html) and the
-[wallet](https://bitshares.github.io/doxygen/classgraphene_1_1wallet_1_1wallet__api.html).
+about APIs for the [node](https://Pay2Exchange.github.io/doxygen/namespacegraphene_1_1app.html) and the
+[wallet](https://Pay2Exchange.github.io/doxygen/classgraphene_1_1wallet_1_1wallet__api.html).
 
 
 FAQ
@@ -365,8 +363,8 @@ FAQ
 
     The second number specifies the *type*.  The type of the object determines what fields it has.  For a
     complete list of type IDs, see `GRAPHENE_DEFINE_IDS(protocol, protocol_ids ...)` in
-    [protocol/types.hpp](https://github.com/bitshares/bitshares-core/blob/master/libraries/protocol/include/graphene/protocol/types.hpp)
-    and `GRAPHENE_DEFINE_IDS(chain, implementation_ids ...)` in [chain/types.hpp](https://github.com/bitshares/bitshares-core/blob/master/libraries/chain/include/graphene/chain/types.hpp).
+    [protocol/types.hpp](https://github.com/pay2exchange/pay2exchange-core/blob/master/libraries/protocol/include/graphene/protocol/types.hpp)
+    and `GRAPHENE_DEFINE_IDS(chain, implementation_ids ...)` in [chain/types.hpp](https://github.com/pay2exchange/pay2exchange-core/blob/master/libraries/chain/include/graphene/chain/types.hpp).
 
     The third number specifies the *instance*.  The instance of the object is different for each individual
     object.
@@ -401,5 +399,5 @@ FAQ
 License
 -------
 
-BitShares Core is under the MIT license. See [LICENSE](https://github.com/bitshares/bitshares-core/blob/master/LICENSE.txt)
+Pay2Exchange Core is under the MIT license. See [LICENSE](https://github.com/pay2exchange/pay2exchange-core/blob/master/LICENSE.txt)
 for more information.

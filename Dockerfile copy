@@ -1,5 +1,5 @@
 # The image for building
-FROM linuxpatch/ubuntu:24.04 as build
+FROM phusion/baseimage:focal-1.2.0 as build
 ENV LANG=en_US.UTF-8
 
 # Install dependencies
@@ -8,28 +8,28 @@ RUN \
     apt-get upgrade -y -o Dpkg::Options::="--force-confold" && \
     apt-get update && \
     apt-get install -y \
-    g++ \
-    autoconf \
-    cmake \
-    git \
-    libbz2-dev \
-    libcurl4-openssl-dev \
-    libssl-dev \
-    libncurses-dev \
-    libboost-thread-dev \
-    libboost-iostreams-dev \
-    libboost-date-time-dev \
-    libboost-system-dev \
-    libboost-filesystem-dev \
-    libboost-program-options-dev \
-    libboost-chrono-dev \
-    libboost-test-dev \
-    libboost-context-dev \
-    libboost-regex-dev \
-    libboost-coroutine-dev \
-    libtool \
-    doxygen \
-    ca-certificates \
+      g++ \
+      autoconf \
+      cmake \
+      git \
+      libbz2-dev \
+      libcurl4-openssl-dev \
+      libssl-dev \
+      libncurses-dev \
+      libboost-thread-dev \
+      libboost-iostreams-dev \
+      libboost-date-time-dev \
+      libboost-system-dev \
+      libboost-filesystem-dev \
+      libboost-program-options-dev \
+      libboost-chrono-dev \
+      libboost-test-dev \
+      libboost-context-dev \
+      libboost-regex-dev \
+      libboost-coroutine-dev \
+      libtool \
+      doxygen \
+      ca-certificates \
     && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -37,26 +37,34 @@ RUN \
 ADD . /bitshares-core
 WORKDIR /bitshares-core
 
-
-
-RUN git submodule update --init --recursive
-RUN cmake \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DGRAPHENE_DISABLE_UNITY_BUILD=ON .
-
-RUN make witness_node cli_wallet get_dev_key
-RUN install -s programs/witness_node/witness_node \
-    programs/genesis_util/get_dev_key \
-    programs/cli_wallet/cli_wallet \
-    /usr/local/bin
-
-# Obtain version
-RUN mkdir -p /etc/bitshares
-RUN git rev-parse --short HEAD > /etc/bitshares/version
-RUN cd / && rm -rf /bitshares-core
+# Compile
+RUN \
+    ( git submodule sync --recursive || \
+      find `pwd`  -type f -name .git | \
+	while read f; do \
+	  rel="$(echo "${f#$PWD/}" | sed 's=[^/]*/=../=g')"; \
+	  sed -i "s=: .*/.git/=: $rel/=" "$f"; \
+	done && \
+      git submodule sync --recursive ) && \
+    git submodule update --init --recursive && \
+    cmake \
+        -DCMAKE_BUILD_TYPE=Release \
+	-DGRAPHENE_DISABLE_UNITY_BUILD=ON \
+        . && \
+    make witness_node cli_wallet get_dev_key && \
+    install -s programs/witness_node/witness_node \
+               programs/genesis_util/get_dev_key \
+               programs/cli_wallet/cli_wallet \
+            /usr/local/bin && \
+    #
+    # Obtain version
+    mkdir -p /etc/bitshares && \
+    git rev-parse --short HEAD > /etc/bitshares/version && \
+    cd / && \
+    rm -rf /bitshares-core
 
 # The final image
-FROM linuxpatch/ubuntu:24.04
+FROM phusion/baseimage:focal-1.2.0
 LABEL maintainer="The bitshares decentralized organisation"
 ENV LANG=en_US.UTF-8
 
@@ -66,8 +74,8 @@ RUN \
     apt-get upgrade -y -o Dpkg::Options::="--force-confold" && \
     apt-get update && \
     apt-get install --no-install-recommends -y \
-    libcurl4 \
-    ca-certificates \
+      libcurl4 \
+      ca-certificates \
     && \
     mkdir -p /etc/bitshares && \
     apt-get clean && \

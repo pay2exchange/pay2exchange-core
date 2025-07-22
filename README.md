@@ -48,16 +48,22 @@ We recommend building on Ubuntu 20.04 LTS (64-bit)
 
 **Build Node And Command-Line Wallet:**
 
+(adjust the `-j` option for the `make` to suit your CPU and RAM resources)
+(in `cmake` command, replace Release with Debug as developer)
+
     git clone https://github.com/pay2exchange/pay2exchange-core.git
     cd Pay2Exchange-core
     git checkout master # may substitute "master" with current release tag
     git submodule update --init --recursive
     mkdir build
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Release ..
-    make
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER_LAUNCHER=ccache  -DCMAKE_CXX_COMPILER_LAUNCHER=ccache  ..
+    make -j 8
 
 **Upgrade Node And Command-Line Wallet:**
+
+(adjust the `-j` option for the `make` to suit your CPU and RAM resources)
+(in `cmake` command, replace Release with Debug as developer)
 
     cd Pay2Exchange-core
     git remote set-url origin https://github.com/pay2exchange/pay2exchange-core.git
@@ -69,8 +75,8 @@ We recommend building on Ubuntu 20.04 LTS (64-bit)
     git submodule update --init --recursive
     mkdir build
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Release ..
-    make
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER_LAUNCHER=ccache  -DCMAKE_CXX_COMPILER_LAUNCHER=ccache  ..
+    make -j 8
 
 **NOTE:**
 

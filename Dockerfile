@@ -59,7 +59,7 @@ RUN cd / && rm -rf /bitshares-core
 
 # The final image
 FROM linuxpatch/ubuntu:24.04
-LABEL maintainer="The bitshares decentralized organisation"
+LABEL maintainer="The pay2exchange decentralized organisation"
 ENV LANG=en_US.UTF-8
 
 # Install required libraries

@@ -30,12 +30,14 @@ jobs:
 
       - name: Build Docker image with sccache
         run: |
-          docker build \
+          docker buildx build \
             --build-arg SCCACHE_DIR=/sccache \
             --mount type=bind,source=${HOME}/.cache/sccache,target=/sccache \
             --cache-from type=local,src=/tmp/.buildx-cache \
             --cache-to type=local,dest=/tmp/.buildx-cache \
-            -t ghcr.io/pay2exchange/pay2exchange-core:${{ github.ref_name }} .
+            -t ghcr.io/pay2exchange/pay2exchange-core:${{ github.ref_name }} \
+            --load \
+            .
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2

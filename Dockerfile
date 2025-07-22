@@ -54,7 +54,6 @@ RUN cmake \
     -DCMAKE_C_COMPILER_LAUNCHER=sccache \
     -DCMAKE_CXX_COMPILER_LAUNCHER=sccache \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_CXX_FLAGS="-Wno-missing-template-keyword" \
     -DGRAPHENE_DISABLE_UNITY_BUILD=ON .
 
 RUN make witness_node cli_wallet get_dev_key

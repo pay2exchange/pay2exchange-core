@@ -4,70 +4,46 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          buildkitd-flags: --debug
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.ref_name }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
       - name: Cache sccache
         uses: actions/cache@v4
         with:
-          save-always: true
           path: ~/.cache/sccache
           key: sccache-${{ runner.os }}-${{ github.ref_name }}
           restore-keys: |
-            sccache-${{ runner.os }}-${{ github.ref_name }}
             sccache-${{ runner.os }}-
-      - name: Decide whether to push to DockerHub, and set tag
-        if: |
-          github.event_name == 'push' &&
-          ( startsWith( github.ref, 'refs/tags/' ) ||
-            contains( fromJSON('["main","develop","testnet","hardfork"]'), github.ref_name ) )
+
+      - name: Build Docker image with sccache
         run: |
-          if [ "${GITHUB_REF_NAME}" == "develop" ] ; then
-            DOCKER_PUSH_TAG=latest
-            DOCKER_IMAGE=ghcr.io/pay2exchange/pay2exchange-core:${DOCKER_PUSH_TAG}
-            echo "DOCKER_IMAGE=${DOCKER_IMAGE}" >> $GITHUB_ENV
-          else
-            DOCKER_PUSH_TAG=${GITHUB_REF_NAME}
-            DOCKER_IMAGE=ghcr.io/pay2exchange/pay2exchange-core:${DOCKER_PUSH_TAG}
-            echo "DOCKER_IMAGE=${DOCKER_IMAGE}" >> $GITHUB_ENV
-          fi
-          echo "DOCKER_PUSH_TAG=${DOCKER_PUSH_TAG}" >> $GITHUB_ENV
-      - name: Test tag
-        if: env.DOCKER_PUSH_TAG != ''
-        run: echo "${DOCKER_IMAGE}"
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - uses: satackey/action-docker-layer-caching@v0.0.11
-        # Ignore the failure of a step and avoid terminating the job.
-        continue-on-error: true
-      - name: Build only
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          load: true
-          build-args: |
-            SCCACHE_DIR=/sccache
-          mounts: |
-            type=bind,source=${{ runner.temp }}/sccache,target=/sccache
-      - name: Login to DockerHub
-        if: env.DOCKER_PUSH_TAG != ''
+          docker build \
+            --build-arg SCCACHE_DIR=/sccache \
+            --mount type=bind,source=${HOME}/.cache/sccache,target=/sccache \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache \
+            -t ghcr.io/pay2exchange/pay2exchange-core:${{ github.ref_name }} .
+
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Push to DockerHub (for branches)
-        if: env.DOCKER_PUSH_TAG != '' && github.ref_name == 'develop'
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ env.DOCKER_IMAGE }}
-      - name: Push to DockerHub (for tags)
-        if: env.DOCKER_PUSH_TAG != '' && env.DOCKER_PUSH_TAG_SHORT != ''
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: |
-            ghcr.io/pay2exchange/pay2exchange-core:${{ env.DOCKER_PUSH_TAG }}
-            ghcr.io/pay2exchange/pay2exchange-core:${{ env.DOCKER_PUSH_TAG_SHORT }}
+
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/pay2exchange/pay2exchange-core:${{ github.ref_name }}

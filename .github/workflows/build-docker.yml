@@ -2,6 +2,7 @@ name: Docker
 on: [push]
 jobs:
   docker:
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - name: Decide whether to push to DockerHub, and set tag
@@ -27,6 +28,13 @@ jobs:
         uses: actions/checkout@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
       - name: Build only
         uses: docker/build-push-action@v4
         with:

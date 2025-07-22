@@ -1,5 +1,5 @@
 # The image for building
-FROM phusion/baseimage:focal-1.2.0 as build
+FROM linuxpatch/ubuntu:24.04 as build
 ENV LANG=en_US.UTF-8
 
 # Install dependencies
@@ -27,6 +27,9 @@ RUN \
       libboost-context-dev \
       libboost-regex-dev \
       libboost-coroutine-dev \
+      liblzma-dev \
+      libzstd-dev \
+      libz-dev \
       libtool \
       doxygen \
       ca-certificates \
@@ -38,33 +41,24 @@ ADD . /bitshares-core
 WORKDIR /bitshares-core
 
 # Compile
-RUN \
-    ( git submodule sync --recursive || \
-      find `pwd`  -type f -name .git | \
-	while read f; do \
-	  rel="$(echo "${f#$PWD/}" | sed 's=[^/]*/=../=g')"; \
-	  sed -i "s=: .*/.git/=: $rel/=" "$f"; \
-	done && \
-      git submodule sync --recursive ) && \
-    git submodule update --init --recursive && \
-    cmake \
-        -DCMAKE_BUILD_TYPE=Release \
-	-DGRAPHENE_DISABLE_UNITY_BUILD=ON \
-        . && \
-    make witness_node cli_wallet get_dev_key && \
-    install -s programs/witness_node/witness_node \
-               programs/genesis_util/get_dev_key \
-               programs/cli_wallet/cli_wallet \
-            /usr/local/bin && \
-    #
-    # Obtain version
-    mkdir -p /etc/bitshares && \
-    git rev-parse --short HEAD > /etc/bitshares/version && \
-    cd / && \
-    rm -rf /bitshares-core
+RUN git submodule update --init --recursive
+RUN cmake \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DGRAPHENE_DISABLE_UNITY_BUILD=ON .
+
+RUN make witness_node cli_wallet get_dev_key
+RUN install -s programs/witness_node/witness_node \
+    programs/genesis_util/get_dev_key \
+    programs/cli_wallet/cli_wallet \
+    /usr/local/bin
+
+# Obtain version
+RUN mkdir -p /etc/bitshares
+RUN git rev-parse --short HEAD > /etc/bitshares/version
+RUN cd / && rm -rf /bitshares-core
 
 # The final image
-FROM phusion/baseimage:focal-1.2.0
+FROM linuxpatch/ubuntu:24.04
 LABEL maintainer="The bitshares decentralized organisation"
 ENV LANG=en_US.UTF-8
 

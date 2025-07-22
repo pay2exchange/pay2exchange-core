@@ -11,7 +11,7 @@ jobs:
           path: ~/.cache/sccache
           key: sccache-${{ runner.os }}-${{ github.ref_name }}
           restore-keys: |
-            sccache-${{ runner.os }}-${{ github.ref_name }}-
+            sccache-${{ runner.os }}-${{ github.ref_name }}
             sccache-${{ runner.os }}-
       - name: Decide whether to push to DockerHub, and set tag
         if: |

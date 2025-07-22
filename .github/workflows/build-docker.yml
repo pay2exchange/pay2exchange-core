@@ -1,6 +1,8 @@
 name: Docker
 on: [push]
 jobs:
+      - name: Ensure sccache directory exists
+        run: mkdir -p /home/runner/.cache/sccache
   docker:
     runs-on: ubuntu-latest
     steps:

@@ -47,20 +47,19 @@ RUN update-locale LANG=en_US.UTF-8
 ADD . /bitshares-core
 WORKDIR /bitshares-core
 ENV SCCACHE_DIRECT="on"
-ENV SCCACHE_DIR=/sccache
-
-RUN git submodule update --init --recursive
-RUN cmake \
-    -DCMAKE_C_COMPILER_LAUNCHER=sccache \
-    -DCMAKE_CXX_COMPILER_LAUNCHER=sccache \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DGRAPHENE_DISABLE_UNITY_BUILD=ON .
-
-RUN make witness_node cli_wallet get_dev_key
-RUN install -s programs/witness_node/witness_node \
-    programs/genesis_util/get_dev_key \
-    programs/cli_wallet/cli_wallet \
-    /usr/local/bin
+RUN --mount=type=bind,target=/sccache,source=/sccache \
+    SCCACHE_DIR=/sccache \
+    git submodule update --init --recursive && \
+    cmake \
+      -DCMAKE_C_COMPILER_LAUNCHER=sccache \
+      -DCMAKE_CXX_COMPILER_LAUNCHER=sccache \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DGRAPHENE_DISABLE_UNITY_BUILD=ON . && \
+    make witness_node cli_wallet get_dev_key && \
+    install -s programs/witness_node/witness_node \
+      programs/genesis_util/get_dev_key \
+      programs/cli_wallet/cli_wallet \
+      /usr/local/bin
 
 # Obtain version
 RUN mkdir -p /etc/bitshares

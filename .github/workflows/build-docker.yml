@@ -7,6 +7,7 @@ jobs:
       - name: Cache sccache
         uses: actions/cache@v4
         with:
+          save-always: true
           path: ~/.cache/sccache
           key: sccache-${{ runner.os }}-${{ github.ref_name }}
           restore-keys: |

@@ -4,6 +4,7 @@ jobs:
       - name: Ensure sccache directory exists
         run: mkdir -p /home/runner/.cache/sccache
   docker:
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - name: Check out code

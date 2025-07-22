@@ -40,7 +40,7 @@ jobs:
             --cache-from type=local,src=/tmp/.buildx-cache \
             --cache-to type=local,dest=/tmp/.buildx-cache \
             -t ghcr.io/pay2exchange/pay2exchange-core:${{ github.ref_name }} \
-            --load \
+            --push \
             .
 
       - name: Login to GitHub Container Registry
@@ -51,5 +51,4 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push Docker image
-        run: |
-          docker push ghcr.io/pay2exchange/pay2exchange-core:${{ github.ref_name }}
+        # Image is pushed in the build step above; no need to push again.

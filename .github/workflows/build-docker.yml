@@ -2,6 +2,7 @@ name: Docker
 on: [push]
 jobs:
   docker:
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - name: Decide whether to push to DockerHub, and set tag

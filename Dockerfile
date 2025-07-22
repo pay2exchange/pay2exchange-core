@@ -47,7 +47,7 @@ RUN update-locale LANG=en_US.UTF-8
 ADD . /bitshares-core
 WORKDIR /bitshares-core
 ENV SCCACHE_DIRECT="on"
-RUN --mount=type=bind,target=/sccache,source=/root/.cache/sccache \
+RUN --mount=type=bind,target=/sccache,source=/github/home/.cache/sccache \
     SCCACHE_DIR=/sccache \
     git submodule update --init --recursive && \
     cmake \

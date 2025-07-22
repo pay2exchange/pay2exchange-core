@@ -28,6 +28,9 @@ jobs:
           restore-keys: |
             sccache-${{ runner.os }}-
 
+      - name: Ensure sccache directory exists
+        run: mkdir -p /github/home/.cache/sccache
+
       - name: Build Docker image with sccache
         run: |
           docker buildx build \

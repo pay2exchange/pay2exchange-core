@@ -335,6 +335,33 @@ if(ENABLE_COVERAGE_TESTING)
     SET(CMAKE_CXX_FLAGS "--coverage ${CMAKE_CXX_FLAGS}")
 endif()
 
+add_flag_append(CMAKE_CXX_FLAGS "-DBOOST_BIND_GLOBAL_PLACEHOLDERS") # to quiet the warnings (seen on Ubuntu 24.04 for example) about default _1 globals of boost (default to old behaviour of boost, this is what the code base expects)
+
+
+# -----------------------------------------------
+
+message(NOTICE "-----------------------------------------------")
+# Convert build type to uppercase - to check variable below
+string(TOUPPER "${CMAKE_BUILD_TYPE}" BUILD_TYPE_UPPER)
+
+# final flags considering the build type
+set(FINAL_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_${BUILD_TYPE_UPPER}}")
+set(FINAL_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${BUILD_TYPE_UPPER}}")
+
+# Print the used flags
+message(NOTICE "### CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+
+message(NOTICE "... CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
+message(NOTICE "... CMAKE_C_FLAGS_${BUILD_TYPE_UPPER}: ${CMAKE_C_FLAGS_${BUILD_TYPE_UPPER}}")
+message(NOTICE "### FINAL_C_FLAGS: ${FINAL_C_FLAGS}")
+
+message(NOTICE "... CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+message(NOTICE "... CMAKE_CXX_FLAGS_${BUILD_TYPE_UPPER}: ${CMAKE_CXX_FLAGS_${BUILD_TYPE_UPPER}}")
+message(NOTICE "### FINAL_CXX_FLAGS: ${FINAL_CXX_FLAGS}")
+message(NOTICE "-----------------------------------------------")
+
+# -----------------------------------------------
+
 add_subdirectory( libraries )
 add_subdirectory( programs )
 add_subdirectory( tests )

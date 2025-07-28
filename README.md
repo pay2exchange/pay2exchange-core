@@ -407,3 +407,12 @@ License
 
 Pay2Exchange Core is under the MIT license. See [LICENSE](https://github.com/pay2exchange/pay2exchange-core/blob/master/LICENSE.txt)
 for more information.
+
+For developers
+--------------
+
+Experimental and not too user-friendly notes drafts and other materials can be seen in this separate repository:
+
+https://github.com/entropycoset/pay2exchange-mydrafts/
+
+

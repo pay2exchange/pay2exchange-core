@@ -12,6 +12,8 @@ set( INSTALLER_APP_ID "68ad7005-8eee-49c9-95ce-9eed97e5b347" )
 set( CMAKE_CXX_STANDARD 14 )
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
 
+set( REASONABLE_MAXIMUM_OPTIM_FLAG 2 ) # security: do not go above this -O level, such as -O2. For example some would say -O3 in some conditions increases chances of exploiting vulnerability in code (if any) compared to lower
+
 if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR
     "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
   set( CMAKE_CXX_EXTENSIONS ON ) # for __int128 support
@@ -113,8 +115,9 @@ unset( MANUAL_SUBMODULES CACHE )
 if (CMAKE_COMPILER_IS_GNUCXX)
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		message (STATUS "Setting optimizations for clang++")
-		set(CMAKE_CXX_FLAGS_RELEASE "-D_FORTIFY_SOURCE=2 -O3 -DNDEBUG=1")
-		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-D_FORTIFY_SOURCE=2 -O3 -DNDEBUG=1 -g")
+		set(CMAKE_CXX_FLAGS_RELEASE "-D_FORTIFY_SOURCE=2 -O${REASONABLE_MAXIMUM_OPTIM_FLAG} -DNDEBUG=1")
+		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-D_FORTIFY_SOURCE=2 -O${REASONABLE_MAXIMUM_OPTIM_FLAG} -DNDEBUG=1 -g3 -fno-omit-frame-pointer")
+		set(CMAKE_CXX_FLAGS_DEBUG "-D_FORTIFY_SOURCE=2 -O0 -DDEBUG=1 -g3 -fno-omit-frame-pointer")
 
 		# check and add data execution prevention
 		message (STATUS "Enabling data execution prevention")
@@ -129,9 +132,10 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 			add_flag_append(CMAKE_CXX_FLAGS "-fstack-protector")
 		endif()
 	else ()
-		message (STATUS "Setting optimizations for g++")
-		set(CMAKE_CXX_FLAGS_RELEASE "-D_FORTIFY_SOURCE=2 -O3 -DNDEBUG=1")
-		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-D_FORTIFY_SOURCE=2 -O3 -DNDEBUG=1 -g")
+		message (STATUS "Setting optimizations for other compilers")
+		set(CMAKE_CXX_FLAGS_RELEASE "-D_FORTIFY_SOURCE=2 -O${REASONABLE_MAXIMUM_OPTIM_FLAG} -DNDEBUG=1")
+		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-D_FORTIFY_SOURCE=2 -O${REASONABLE_MAXIMUM_OPTIM_FLAG} -DNDEBUG=1 -g3 -fno-omit-frame-pointer")
+		set(CMAKE_CXX_FLAGS_DEBUG "-D_FORTIFY_SOURCE=2 -O0 -DDEBUG=1 -g3 -fno-omit-frame-pointer")
 
 		# check and add data execution prevention
 		set(CMAKE_REQUIRED_FLAGS "-Wl,-znoexecstack")
@@ -151,6 +155,13 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 		endif()
 
 	endif ()
+else ()
+	message (STATUS "Compiler not from the GNUXXX-like (gcc/clang) family...")
+	message (WARNING "This is NOT WELL SUPPORTED NOW (e.g. lacks security falgs!!)")
+	# TODO
+	set(CMAKE_CXX_FLAGS_RELEASE "-D_FORTIFY_SOURCE=2 -O${REASONABLE_MAXIMUM_OPTIM_FLAG} -DNDEBUG=1")
+	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-D_FORTIFY_SOURCE=2 -O${REASONABLE_MAXIMUM_OPTIM_FLAG} -DNDEBUG=1 -g3 -fno-omit-frame-pointer")
+	set(CMAKE_CXX_FLAGS_DEBUG "-D_FORTIFY_SOURCE=2 -O0 -DDEBUG=1 -g3 -fno-omit-frame-pointer")
 endif ()
 
 # check for Data relocation and Protection (RELRO)

@@ -75,4 +75,3 @@ if(SELECTED_LINKER)
 else()
   message(STATUS "Using system default linker")
 endif()
-

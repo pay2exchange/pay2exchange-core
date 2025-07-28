@@ -43,8 +43,24 @@ namespace graphene { namespace chain {
 
 database::database()
 {
+   std::cout << "XXX DB="<<(static_cast<void*>(this))<<" new - ctor start " << "\n"; // XXX debug
    initialize_indexes();
    initialize_evaluators();
+
+
+
+   {
+       std::cout << "XXX DB="<<(static_cast<void*>(this))<<" new - ctor done, now:... \n";
+       if (this->_p_dyn_global_prop_obj) {
+           fc::variant v; fc::to_variant(this->_p_dyn_global_prop_obj->recent_slots_filled, v);
+           std::cout << "XXX DB="<<(static_cast<void*>(this))<<" new - ctor done, recent_slots_filled=" << v.as_string() << "\n"; // XXX debug
+       }
+       else {
+           std::cout << "XXX DB="<<(static_cast<void*>(this))<<" new - ctor done, global dyn prop are NULL.\n"; // XXX debug
+
+       }
+   }
+
 }
 
 database::~database()

@@ -34,6 +34,7 @@
 #include <boost/filesystem/path.hpp>
 
 #include <iostream>
+#include <iomanip>
 
 using namespace graphene::witness_plugin;
 using std::string;

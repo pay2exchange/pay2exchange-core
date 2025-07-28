@@ -43,6 +43,9 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include <iostream> // XXX debug
+#include <fc/variant.hpp> // XXX debug
+
 namespace graphene { namespace chain {
 
 void database::init_genesis(const genesis_state_type& genesis_state)
@@ -271,6 +274,10 @@ void database::init_genesis(const genesis_state_type& genesis_state)
       p.dynamic_flags = 0;
       p.witness_budget = 0;
       p.recent_slots_filled = std::numeric_limits<fc::uint128_t>::max();
+
+      
+      { fc::variant v; fc::to_variant(p.recent_slots_filled, v);      std::cout << "XXX slots set to: " << v.as_string() << "\n"; }
+
    });
 
    FC_ASSERT( (genesis_state.immutable_parameters.min_witness_count & 1) == 1, "min_witness_count must be odd" );

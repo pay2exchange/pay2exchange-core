@@ -48,6 +48,9 @@
 #include <graphene/chain/worker_object.hpp>
 #include <graphene/chain/custom_authority_object.hpp>
 
+#include <iostream>
+#include <iomanip>
+
 namespace graphene { namespace chain {
 
 template<class Index>
@@ -441,17 +444,32 @@ void database::initialize_budget_record( fc::time_point_sec now, budget_record& 
    // end of the maintenance interval.  Thus the accumulated_fees
    // are available for the budget at this point, but not included
    // in core.reserved().
+   const auto _from_in_res = rec.from_initial_reserve;
+   const auto _accu_fee = core_dd.accumulated_fees;
+
    share_type reserve = rec.from_initial_reserve + core_dd.accumulated_fees;
    // Similarly, we consider leftover witness_budget to be burned
    // at the BEGINNING of the maintenance interval.
+   const auto _wit_bud = dpo.witness_budget;
    reserve += dpo.witness_budget;
 
    fc::uint128_t budget_u128 = reserve.value;
+   const auto _res_val = reserve.value;
    budget_u128 *= uint64_t(dt);
    budget_u128 *= GRAPHENE_CORE_ASSET_CYCLE_RATE;
    //round up to the nearest satoshi -- this is necessary to ensure
    //   there isn't an "untouchable" reserve, and we will eventually
    //   be able to use the entire reserve
+   std::cout <<
+	  "init reserv : "<<std::setw(15)<<_from_in_res.value<<"  "<<
+	  "accu feets  : "<<std::setw(15)<<_accu_fee.value<<"  "<<
+	  "witn budget : "<<std::setw(15)<<_wit_bud.value<<"  "<<
+	  "reserv val : "<<std::setw(15)<<_res_val<<"  "<<
+	  "dt : "<<std::setw(5)<<dt<<"  "<<
+	  "CY_RATE     : "<<std::setw(5)<<GRAPHENE_CORE_ASSET_CYCLE_RATE<<"  "<<
+	  "CY_RATE_BITS: "<<std::setw(5)<<GRAPHENE_CORE_ASSET_CYCLE_RATE_BITS<<"  "<<
+	//  "budget_u128="<<std::setw(15)<<budget_u128.value <<
+	  std::endl;
    budget_u128 += ((uint64_t(1) << GRAPHENE_CORE_ASSET_CYCLE_RATE_BITS) - 1);
    budget_u128 >>= GRAPHENE_CORE_ASSET_CYCLE_RATE_BITS;
    if( budget_u128 < static_cast<fc::uint128_t>(reserve.value) )

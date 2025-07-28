@@ -29,6 +29,9 @@
 
 #include <fc/popcount.hpp>
 
+#include <iostream>
+#include <iomanip>
+
 namespace graphene { namespace chain {
 
 using boost::container::flat_set;
@@ -98,6 +101,8 @@ uint32_t database::update_witness_missed_blocks( const signed_block& b )
 uint32_t database::witness_participation_rate()const
 {
    const dynamic_global_property_object& dpo = get_dynamic_global_properties();
+   const auto popc = fc::popcount(dpo.recent_slots_filled);
+   std::cout << "pop count in 128 blocks: " << static_cast<int>(popc) << "\n"; // XXX debug
    return uint64_t(GRAPHENE_100_PERCENT) * fc::popcount(dpo.recent_slots_filled) / 128;
 }
 

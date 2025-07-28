@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 #include <graphene/db/object_database.hpp>
+#include <iostream>
 
 #include <fc/io/raw.hpp>
 #include <fc/container/flat.hpp>
@@ -54,6 +55,7 @@ const index& object_database::get_index(uint8_t space_id, uint8_t type_id)const
    FC_ASSERT( _index.size() > space_id,
               "Database index ${space_id}.${type_id} does not exist, index size is ${index.size}",
               ("space_id",space_id)("type_id",type_id)("index.size",_index.size()) );
+   // std::cout << __PRETTY_FUNCTION__ << ": this="<<(void*)this<< " space_id=" << (long int)space_id << " type_id="<< (long int)type_id << "\n"; // XXX
    FC_ASSERT( _index[space_id].size() > type_id,
               "Database index ${space_id}.${type_id} does not exist, space size is ${index[space_id].size}",
               ("space_id",space_id)("type_id",type_id)("index[space_id].size",_index[space_id].size()) );

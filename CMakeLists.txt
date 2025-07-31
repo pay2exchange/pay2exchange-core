@@ -193,6 +193,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 set( GRAPHENE_EGENESIS_JSON "${CMAKE_CURRENT_SOURCE_DIR}/libraries/egenesis/genesis.json"
      CACHE STRING "Path to embedded genesis file" )
 
+set(USE_PCH TRUE)
 if (USE_PCH)
   include (cotire)
 endif(USE_PCH)

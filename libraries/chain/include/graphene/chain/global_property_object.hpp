@@ -26,6 +26,7 @@
 #include <graphene/protocol/chain_parameters.hpp>
 #include <graphene/chain/types.hpp>
 #include <graphene/db/object.hpp>
+#include <fc/hookedint.hpp>
 
 namespace graphene { namespace chain {
 
@@ -93,7 +94,7 @@ namespace graphene { namespace chain {
          /**
           * used to compute witness participation.
           */
-         fc::uint128_t recent_slots_filled;
+         HookedInt<fc::uint128_t> recent_slots_filled;
 
          /**
           * dynamic_flags specifies chain state properties that can be

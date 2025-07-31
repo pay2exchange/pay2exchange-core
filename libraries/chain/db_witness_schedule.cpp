@@ -102,7 +102,8 @@ uint32_t database::witness_participation_rate()const
 {
    const dynamic_global_property_object& dpo = get_dynamic_global_properties();
    const auto popc = fc::popcount(dpo.recent_slots_filled);
-   std::cout << "pop count in 128 blocks: " << static_cast<int>(popc) << "\n"; // XXX debug
+   std::cout << __FILE__ << " XXX in DB this=" << (static_cast<const void*>(this)) << "  pop count in 128 blocks: " << static_cast<int>(popc)
+	   << " in DGP object at dpo=" << (static_cast<const void*>(&dpo)) << "\n"; // XXX debug
    return uint64_t(GRAPHENE_100_PERCENT) * fc::popcount(dpo.recent_slots_filled) / 128;
 }
 

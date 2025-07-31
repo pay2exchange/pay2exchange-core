@@ -45,11 +45,16 @@
 
 #include <iostream> // XXX debug
 #include <fc/variant.hpp> // XXX debug
+void _xxx_point1() {
+	volatile int i=0;
+	i++;
+}
 
 namespace graphene { namespace chain {
 
 void database::init_genesis(const genesis_state_type& genesis_state)
 { try {
+	std::cout<<"XXX init_genesis " << __FILE__ << "... for this=" << (static_cast<const void*>(this)) << "\n";
    FC_ASSERT( genesis_state.initial_timestamp != time_point_sec(), "Must initialize genesis timestamp." );
    FC_ASSERT( genesis_state.initial_timestamp.sec_since_epoch() % GRAPHENE_DEFAULT_BLOCK_INTERVAL == 0,
               "Genesis timestamp must be divisible by GRAPHENE_DEFAULT_BLOCK_INTERVAL." );
@@ -276,9 +281,28 @@ void database::init_genesis(const genesis_state_type& genesis_state)
       p.recent_slots_filled = std::numeric_limits<fc::uint128_t>::max();
 
       
-      { fc::variant v; fc::to_variant(p.recent_slots_filled, v);      std::cout << "XXX slots set to: " << v.as_string() << "\n"; }
+      {
+      	fc::variant v; fc::to_variant(p.recent_slots_filled, v);
+	std::cout << "XXX in GENESIS slots set to: " << v.as_string() << " "
+	  << "in DGP p="<<(static_cast<void*>(&p))
+		<< " in " << __FILE__ << "\n"; 
+      }
+
 
    });
+
+std::cout<<"XXX init_genesis " << __FILE__ << "... for this=" << (static_cast<const void*>(this))
+	<< " after the create<> on DGPO, we have GDPO at " << (static_cast<const void*>(& _p_dyn_global_prop_obj))
+	<<" so recent_slots_filled is at "  << (static_cast<const void*>(& _p_dyn_global_prop_obj->recent_slots_filled))
+	<<" and has value...: "
+       	<< "\n";
+      {
+      	fc::variant v; fc::to_variant(this->_p_dyn_global_prop_obj->recent_slots_filled, v);
+	std::cout << "XXX slots set to: " << v.as_string() << " "
+		<< "\n"; 
+	_xxx_point1();
+      }
+
 
    FC_ASSERT( (genesis_state.immutable_parameters.min_witness_count & 1) == 1, "min_witness_count must be odd" );
    FC_ASSERT( (genesis_state.immutable_parameters.min_committee_member_count & 1) == 1,

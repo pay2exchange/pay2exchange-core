@@ -49,7 +49,8 @@ database::database()
 
 
 
-   {
+   { // XXX debug
+       std::cout  <<  "XXX GDP prob in this in: " << (static_cast<void*>(& this->_p_dyn_global_prop_obj)) << "\n";
        std::cout << "XXX DB="<<(static_cast<void*>(this))<<" new - ctor done, now:... \n";
        if (this->_p_dyn_global_prop_obj) {
            fc::variant v; fc::to_variant(this->_p_dyn_global_prop_obj->recent_slots_filled, v);

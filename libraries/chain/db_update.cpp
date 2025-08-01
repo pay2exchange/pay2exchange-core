@@ -63,6 +63,17 @@ void database::update_global_dynamic_data( const signed_block& b, const uint32_t
       dgp.head_block_id = b.id();
       dgp.time = b.timestamp;
       dgp.current_witness = b.witness;
+
+      const typeof(missed_blocks) max_missed_blocks = 126; // 128-1 would be max, but another -1 to not think about any signed-overflow
+      if (missed_blocks > max_missed_blocks) {
+         std::cerr << std::endl << "ERROR: Invalid bit-shift while counting recent_slots_filled, based on missed_blocks="<<missed_blocks<<", "
+	    << "the program will abort. This happens e.g. when your node runs as witness, "
+	    << "but you are far behind the expected blockchain time - perhaps you use own custom Genesis block, but the "
+	    << "initial_timestamp is more than " << max_missed_blocks << " blocks behind.\n"
+	    << "As developer of a new chain, you can consider setting initial_timestamp in Genesis to be a very recent time point, "
+	    << "or perhaps even set it a bit into the future. Or maybe see the runtime flag 'genesis-timestamp' while only testing.";
+	 std::abort();
+      }
       dgp.recent_slots_filled = (
            (dgp.recent_slots_filled << 1)
            + 1) << missed_blocks;

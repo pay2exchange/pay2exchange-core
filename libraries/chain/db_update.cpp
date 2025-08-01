@@ -38,6 +38,7 @@
 #include <graphene/chain/witness_object.hpp>
 
 #include <graphene/protocol/fee_schedule.hpp>
+#include <iostream>
 
 namespace graphene { namespace chain {
 
@@ -63,6 +64,8 @@ void database::update_global_dynamic_data( const signed_block& b, const uint32_t
       dgp.head_block_id = b.id();
       dgp.time = b.timestamp;
       dgp.current_witness = b.witness;
+      std::cout << __FILE__ << ":" << __LINE__ << " XXX missed_blocks = " << missed_blocks;
+      if (missed_blocks)
       dgp.recent_slots_filled = (
            (dgp.recent_slots_filled << 1)
            + 1) << missed_blocks;

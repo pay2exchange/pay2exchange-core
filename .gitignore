@@ -41,3 +41,17 @@ object_database/*
 
 *.pyc
 *.pyo
+
+CMakeDoxyfile.in
+libraries/egenesis/egenesis_brief.cpp
+libraries/egenesis/egenesis_full.cpp
+programs/build_helpers/member_enumerator
+programs/genesis_util/convert_address
+programs/genesis_util/genesis_update
+programs/genesis_util/get_dev_key
+programs/network_mapper/network_mapper
+programs/size_checker/size_checker
+tests/cli_test
+tests/es_test
+tests/generate_empty_blocks/generate_empty_blocks
+

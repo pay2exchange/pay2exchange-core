@@ -39,6 +39,8 @@
 
 #include <graphene/protocol/fee_schedule.hpp>
 
+#include <fc/log/logger.hpp>
+
 namespace graphene { namespace chain {
 
 void database::update_global_dynamic_data( const signed_block& b, const uint32_t missed_blocks )
@@ -63,9 +65,30 @@ void database::update_global_dynamic_data( const signed_block& b, const uint32_t
       dgp.head_block_id = b.id();
       dgp.time = b.timestamp;
       dgp.current_witness = b.witness;
-      dgp.recent_slots_filled = (
-           (dgp.recent_slots_filled << 1)
-           + 1) << missed_blocks;
+
+      // we now move forward the recent_slots_filled by bit-shifting to left, but you can't bitshift with operator<< but too high number, so:
+      static_assert(sizeof(recent_slots_filled)*CHAR_BIT==128);
+      const typeof(missed_blocks) max_missed_blocks = 126; // 128-1 would be max, but another -1 to not think about any signed-overflow
+      if (missed_blocks > max_missed_blocks) {
+         wlog("big value of missed_blocks=${missed_blocks}", ("missed_blocks",missed_blocks));
+         // print extra explanation, exactly one time (thread safe, C++14: 6.7.4)
+	 static bool _warned_once = []() {
+            wlog(
+	       "This (big value of missed_blocks) happens e.g. when your node runs as witness, "
+               "but you are far behind the expected blockchain time - perhaps you use own custom Genesis block, but the "
+               "initial_timestamp is more than ${max_missed_blocks} blocks behind. "
+               "As developer of a new chain, you can consider setting initial_timestamp in Genesis to be a very recent time point, "
+               "or perhaps even set it a bit into the future. Or maybe see the runtime flag 'genesis-timestamp' while only testing."
+	       , ("max_missed_blocks",max_missed_blocks)
+	    );
+	 }(); // warn now
+         dgp.recent_slots_filled = 0; // any value shifted by that many missed_blocks becomes a zero
+      }
+      else {
+         dgp.recent_slots_filled = (
+              (dgp.recent_slots_filled << 1)
+              + 1) << missed_blocks;
+      }
       dgp.current_aslot += missed_blocks+1;
    });
 

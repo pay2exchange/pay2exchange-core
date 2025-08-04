@@ -66,25 +66,9 @@ void database::update_global_dynamic_data( const signed_block& b, const uint32_t
       dgp.time = b.timestamp;
       dgp.current_witness = b.witness;
 
-
-      static_assert(sizeof(dgp.recent_slots_filled)*CHAR_BIT==128, "This safe-check code below assumes size of recent_slots_filled is 128 bit");
-      const typeof(missed_blocks) max_missed_blocks = 126; // 128-1 would be max, but another -1 to not think about any signed-overflow
-
-      if (missed_blocks > max_missed_blocks) {
-         elog("big value of missed_blocks=${missed_blocks}", ("missed_blocks",missed_blocks));
-	 static bool _warned_once = [max_missed_blocks]() { // print explanation, exactly once (thread safe, C++14: 6.7.4)
-            elog(
-	       "This (big value of missed_blocks) happens e.g. when your node runs as witness, "
-               "but you are far behind the expected blockchain time - perhaps you use own custom Genesis block, but the "
-               "initial_timestamp is more than ${max_missed_blocks} blocks behind. "
-               "As developer of a new chain, you can consider setting initial_timestamp in Genesis to be a very recent time point, "
-               "or perhaps even set it a bit into the future. Or maybe see the runtime flag 'genesis-timestamp' while only testing."
-	       , ("max_missed_blocks",max_missed_blocks)
-	    );
-	    return 0;
-	 }();
-	 (void)_warned_once; // quiet unused-warning
-         dgp.recent_slots_filled = 0; // any value shifted by that many missed_blocks becomes a zero
+      if (missed_blocks >= 128) { // we must avoid calculating bitshift (A<<B) for B equal-or-larger than number of bits in A
+         wlog("big value of missed_blocks=${missed_blocks}", ("missed_blocks",missed_blocks));
+         dgp.recent_slots_filled = 0; // any 128 bit value left-shifted by 128 or more - becomes a zero
       }
       else {
          dgp.recent_slots_filled = (

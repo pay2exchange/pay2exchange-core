@@ -48,6 +48,12 @@ namespace graphene { namespace chain {
 void database::init_genesis(const genesis_state_type& genesis_state)
 { try {
    FC_ASSERT( genesis_state.initial_timestamp != time_point_sec(), "Must initialize genesis timestamp." );
+
+   const auto genesis_sec =  genesis_state.initial_timestamp.sec_since_epoch();
+   const auto def_interval = GRAPHENE_DEFAULT_BLOCK_INTERVAL;
+   const auto reminder = genesis_sec % def_interval;
+   ilog("genesis timestamp (sec from epoch) is: ${genesis_sec}, default block interval is ${def_interval}, reminder is ${reminder}",
+      ("genesis_sec", genesis_sec) ("def_interval", def_interval) ("reminder",reminder));
    FC_ASSERT( genesis_state.initial_timestamp.sec_since_epoch() % GRAPHENE_DEFAULT_BLOCK_INTERVAL == 0,
               "Genesis timestamp must be divisible by GRAPHENE_DEFAULT_BLOCK_INTERVAL." );
    FC_ASSERT(genesis_state.initial_witness_candidates.size() > 0,

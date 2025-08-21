@@ -324,6 +324,7 @@ endif()
 
 add_flag_append(CMAKE_CXX_FLAGS "-DBOOST_BIND_GLOBAL_PLACEHOLDERS") # to quiet the warnings (seen on Ubuntu 24.04 for example) about default _1 globals of boost (default to old behaviour of boost, this is what the code base expects)
 
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=undefined")
 
 # -----------------------------------------------
 

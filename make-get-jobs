@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+#(C) 2025 chaoscoset - BSD 3 clause licence and public domain
+#vibecoded draft, modified
+#recommends number of jobs to use in make -j ... based on the expected amount of RAM used per compilation thread (1st argument) and detected CPU cores/threads and detected memory
+
+set -euo pipefail
+
+function usage() {
+	echo "Usage:"
+	echo "program MEMCOMPILE CPU_PERC CPU_ADD MEM_RESERVE"
+	echo "  MEMCOMPILE is the expected maximum compilation size in MB, such as 100 or 1000."
+	echo "  CPU_PERC is percentage of cpu cores to use, such as 100 = 100%. You can try more e.g. 200 to be sure CPUs are compiling even when waiting for disk or such, or e.g. 80 to reserve some as unused"
+	echo "  CPU_ADD is the number of cores to add (or reserve as unused) such as 0, or 1 to add one more to keep build more busy, or -1 to reserve one as alway unused in build"
+	echo "  MEM_RESERVE is the number of MB to still substract from free RAM such as 0 or 128 to reserve additionally (e.g. for linker) in case if something uses more ram. It can how ever also be negative to use more ram (e.g. swap)"
+}
+
+# Parse and validate args
+if [ $# -lt 1 ] || [ $# -gt 4 ]; then
+	usage
+  exit 1
+fi
+
+MEMCOMPILE=$1
+CPU_PERC=${2:-100}
+CPU_ADD=${3:-0}
+MEM_RESERVE=${4:-0}
+
+# Validate MEMCOMPILE: positive integer
+if ! [[ "$MEMCOMPILE" =~ ^[0-9]+$ ]] || [ "$MEMCOMPILE" -le 0 ]; then
+  echo "Error: MEMCOMPILE must be a positive integer." >&2
+	usage
+  exit 1
+fi
+
+# Validate CPU_PERC: integer 1–100
+if ! [[ "$CPU_PERC" =~ ^[0-9]+$ ]] || [ "$CPU_PERC" -lt 1 ] || [ "$CPU_PERC" -gt 1000 ]; then
+  echo "Error: CPU_PERC must be an integer between 1 and 100." >&2
+	usage
+  exit 1
+fi
+
+# Validate CPU_ADD: integer 0–100
+if ! [[ "$CPU_ADD" =~ ^[-]?[0-9]+$ ]] || [ "$CPU_ADD" -lt -1000 ] || [ "$CPU_ADD" -gt 1000 ]; then
+  echo "Error: CPU_ADD must be an integer between -1000 and 1000." >&2
+	usage
+  exit 1
+fi
+
+if ! [[ "$MEM_RESERVE" =~ ^[-]?[0-9]+$ ]] || [ "$MEM_RESERVE" -lt -8192000 ] || [ "$MEM_RESERVE" -gt +8192000 ]; then
+  echo "Error: MEM_RESERVE must be an integer between -1000 and 1000." >&2
+	usage
+  exit 1
+fi
+
+
+MEMCOMPILE=$1
+OS=$(uname)
+
+# Function: free RAM in MB
+get_free_mem_mb() {
+  case "$OS" in
+    Linux)
+      if grep -q MemAvailable /proc/meminfo; then
+        awk '/MemAvailable/ {print int($2/1024)}' /proc/meminfo
+      else
+        free -m | awk 'NR==2 {print $7}'
+      fi
+      ;;
+    Darwin)
+      pages=$(vm_stat | \
+        awk '/Pages free:/      {f=$3}
+             /Pages inactive:/  {i=$3}
+             /Pages speculative:/{s=$3}
+             END {print f+i+s}' | tr -d '.')
+      page_size=$(sysctl -n hw.pagesize)
+      echo $(( pages * page_size / 1024 / 1024 ))
+      ;;
+    FreeBSD|OpenBSD|NetBSD)
+      free_pages=$(sysctl -n vm.stats.vm.v_free_count 2>/dev/null || echo 0)
+      inactive_pages=$(sysctl -n vm.stats.vm.v_inactive_count 2>/dev/null || echo 0)
+      page_size=$(sysctl -n hw.pagesize 2>/dev/null || echo 4096)
+      echo $(( (free_pages + inactive_pages) * page_size / 1024 / 1024 ))
+      ;;
+    *)
+      if command -v free >/dev/null 2>&1; then
+        free -m | awk 'NR==2 {print $4}'
+      else
+        # cannot detect; return 0 to trigger fallback
+        echo 0
+      fi
+      ;;
+  esac
+}
+
+# Function: CPU count
+get_cpu_count() {
+  if count=$(getconf _NPROCESSORS_ONLN 2>/dev/null) && [ "$count" -ge 1 ]; then
+    echo "$count"
+  elif command -v sysctl >/dev/null 2>&1; then
+    sysctl -n hw.ncpu 2>/dev/null || echo 1
+  else
+    echo 1
+  fi
+}
+
+# Main
+free_mem=$(get_free_mem_mb)
+
+# Fallback if detection failed
+if [ "$free_mem" -lt 1 ]; then
+  echo "Notice: could not detect free RAM; assuming 100 MB" >&2
+  free_mem=100
+fi
+
+cpu_count_base=$(get_cpu_count)
+cpu_jobs=$(( (cpu_count_base*CPU_PERC)/100 + CPU_ADD))
+if [ "$cpu_jobs" -lt "1" ]; then cpu_jobs=1; fi
+
+# Compute limits
+max_mem_jobs=$(( (free_mem - MEM_RESERVE) / MEMCOMPILE ))
+
+printf "We prefer (by CPU) to use %-4s jobs (based on %-4s cores).\n" "$cpu_jobs" "$cpu_count_base" >&2
+printf "We could  (by MEM)    use %-4s jobs (based on %-6s MB free RAM and assuming %-6s MB per job).\n" "$max_mem_jobs" "$free_mem" "$MEMCOMPILE" >&2
+
+
+if [ "$max_mem_jobs" -lt 1 ]; then
+  echo "Warning: only ${free_mem}MB free; forcing single job" >&2
+  jobs=1
+elif [ "$cpu_jobs" -lt "$max_mem_jobs" ]; then
+  jobs=$cpu_jobs
+else
+  jobs=$max_mem_jobs
+fi
+
+printf "We will use %-4s jobs.\n" "$jobs" >&2
+# Output only the job count
+echo "$jobs"
+

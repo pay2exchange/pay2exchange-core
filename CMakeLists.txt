@@ -46,6 +46,8 @@ list( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules" )
 include(CheckCCompilerFlag)
 include(Utils)
 
+include(LinkerChoice)
+
 # function to help with cUrl
 macro(FIND_CURL)
    if (NOT WIN32 AND NOT APPLE AND CURL_STATICLIB)

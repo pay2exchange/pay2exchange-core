@@ -4360,7 +4360,12 @@ namespace graphene { namespace net { namespace detail {
         // (it may not be due to ip address, but we'll detect that in the next step)
       }
 
-      _tcp_server.set_reuse_address();
+      if (_tcp_socket_reuse_enabled) {
+        _tcp_server.set_reuse_address();
+        dlog("TCP socket reuse address enabled for P2P listening socket");
+      } else {
+        dlog("TCP socket reuse address disabled for P2P listening socket");
+      }
       try
       {
         if( listen_endpoint.get_address() != fc::ip::address() )
@@ -5052,6 +5057,13 @@ namespace graphene { namespace net { namespace detail {
       return iter != _hard_fork_block_numbers.end() ? *iter : 0;
     }
 
+    void node_impl::set_tcp_socket_reuse(bool enable)
+    {
+      VERIFY_CORRECT_THREAD();
+      _tcp_socket_reuse_enabled = enable;
+      dlog("TCP socket reuse ${status}", ("status", enable ? "enabled" : "disabled"));
+    }
+
   }  // end namespace detail
 
 
@@ -5224,6 +5236,11 @@ namespace graphene { namespace net { namespace detail {
   void node::close() const
   {
     INVOKE_IN_IMPL(close);
+  }
+
+  void node::set_tcp_socket_reuse(bool enable) const
+  {
+    INVOKE_IN_IMPL(set_tcp_socket_reuse, enable);
   }
 
   namespace detail

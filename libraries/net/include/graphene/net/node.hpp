@@ -313,6 +313,12 @@ namespace graphene { namespace net {
 
         void set_total_bandwidth_limit(uint32_t upload_bytes_per_second, uint32_t download_bytes_per_second) const;
 
+        /**
+         * Enable or disable TCP socket reuse (SO_REUSEADDR/SO_REUSEPORT) on P2P listening socket
+         * @param enable set to true to enable socket reuse, false to disable
+         */
+        void set_tcp_socket_reuse(bool enable) const;
+
         fc::variant_object network_get_info() const;
         fc::variant_object network_get_usage_stats() const;
 

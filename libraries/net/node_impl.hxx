@@ -616,6 +616,9 @@ public:
       /// used to prevent us from starting new tasks while we're shutting down
       bool _node_is_shutting_down = false;
 
+      /// TCP socket reuse setting for P2P listening socket
+      bool _tcp_socket_reuse_enabled = false;
+
       /// Maximum number of addresses to handle at one time
       size_t _max_addrs_to_handle_at_once = MAX_ADDRESSES_TO_HANDLE_AT_ONCE;
       /// Maximum number of blocks to handle at one time
@@ -825,6 +828,8 @@ public:
 
       fc::variant_object         network_get_info() const;
       fc::variant_object         network_get_usage_stats() const;
+
+      void                       set_tcp_socket_reuse(bool enable);
 
       bool is_hard_fork_block(uint32_t block_number) const;
       uint32_t get_next_known_hard_fork_block_number(uint32_t block_number) const;

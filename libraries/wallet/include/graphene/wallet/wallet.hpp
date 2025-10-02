@@ -1752,6 +1752,13 @@ class wallet_api
        */
       order_book get_order_book( const string& base, const string& quote, uint32_t limit = 50 )const;
 
+      /** Get ticker for the market base:quote.
+       *  @param base symbol or ID of the base asset
+       *  @param quote symbol or ID of the quote asset
+       *  @return Ticker information of the market
+       */
+      market_ticker get_ticker( const string& base, const string& quote )const;
+
       /** Signs a transaction.
        *
        * Given a fully-formed transaction with or without signatures, signs
@@ -1972,4 +1979,5 @@ FC_API( graphene::wallet::wallet_api,
         (account_store_map)
         (get_account_storage)
         (quit)
+        (get_ticker)
       )

@@ -1927,6 +1927,11 @@ order_book wallet_api::get_order_book( const string& base, const string& quote, 
    return( my->_remote_db->get_order_book( base, quote, limit ) );
 }
 
+market_ticker wallet_api::get_ticker( const string& base, const string& quote )const
+{
+   return my->_remote_db->get_ticker( base, quote );
+}
+
 // custom operations
 signed_transaction wallet_api::account_store_map( const string& account, const string& catalog, bool is_to_remove,
       const flat_map<string, optional<string>>& key_values, bool broadcast )const

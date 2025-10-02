@@ -5,7 +5,7 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
+                     * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
@@ -146,6 +146,7 @@ int main( int argc, char** argv )
          ("daemon,d", "Run the wallet in daemon mode" )
          ("wallet-file,w", bpo::value<string>()->implicit_value("wallet.json"), "wallet to load")
          ("chain-id", bpo::value<string>(), "chain ID to connect to")
+         ("print-genesis-file-chain-id", bpo::value<string>(),"just print the chainID of this given genesis filename, and then exit")
          ("suggest-brain-key", "Suggest a safe brain key to use for creating your account")
          ("logs-rpc-console-level", bpo::value<string>()->default_value("info"),
                "Level of console logging. Allowed levels: info, debug, warn, error, all")
@@ -181,6 +182,31 @@ int main( int argc, char** argv )
          auto keyinfo = graphene::wallet::utility::suggest_brain_key();
          string data = fc::json::to_pretty_string( keyinfo );
          std::cout << data.c_str() << std::endl;
+         return 0;
+      }
+      if ( options.count("print-genesis-file-chain-id") ) {
+         std::cout << "Will read chainID..." << std::endl;
+         const std::string json_fn = options["print-genesis-file-chain-id"].as<string>();
+         std::cout << "Will read chainID... from file name: [" << json_fn <<  "]" << std::endl;
+         genesis_state_type that_gs;
+         const auto that_json = fc::json::from_file(json_fn );
+         //std::cout << "Read json genesis data as [" << that_json.as_string() << "]\n";
+         genesis_state_type that_gs = that_json.as<graphene::chain::genesis_state_type>(GRAPHENE_MAX_NESTED_OBJECTS);
+         graphene::chain::apply_genesis_state_defaults(that_gs); // <--- fill in empty default fields? TODO, only witness_node does it?
+         const auto id = that_gs.compute_chain_id();
+         if (id == chain_id_type()) {
+            std::cout << "Warning: Computed chain ID is empty. Checking genesis state..." << std::endl;
+            // Print relevant genesis state fields to help debug
+            std::cout << "Genesis state initial parameters: "
+                  << fc::json::to_string(that_gs.initial_parameters) << std::endl;
+            std::cout << "Genesis state initial timestamp: "
+                  << fc::json::to_string(that_gs.initial_timestamp) << std::endl;
+         }
+         std::cout << "num initial accounts: " << that_gs.initial_accounts.size() << std::endl;
+         std::cout << "num initial witnesses: " << that_gs.initial_active_witnesses << std::endl;
+
+         std::cout << "chain_id=(" << id.str() << ")\n"
+            << "genesis_file=(" << json_fn << ")" << std::endl;
          return 0;
       }
 

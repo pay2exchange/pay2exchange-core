@@ -19,6 +19,32 @@ namespace boost {
 namespace safe_numerics {
 namespace safe_compare {
 
+// some (broken) compilers needed extra word "template" in some c++ expressions
+// other ones allow it but do not need it (ignore it)
+// while most new have it as diagnostic, of them some can not be ignored
+// the correct C++ is to define this macro to nothing "", so to not use the extra word "template" in this places
+#if defined(_MSC_VER)
+  // MSVC historically permissive — keep the token for compatibility
+  #define EXP_TEMPLATE_DISAMBIG template
+#elif defined(__clang__)
+  // Treat Clang <= 19 (especially 18) as "old"
+  #if __clang_major__ <= 19
+    #define EXP_TEMPLATE_DISAMBIG template
+  #else
+    #define EXP_TEMPLATE_DISAMBIG
+  #endif
+#elif defined(__GNUC__)
+  // Treat GCC <= 14 (especially 13) as "old"
+  #if __GNUC__ <= 13
+    #define EXP_TEMPLATE_DISAMBIG template
+  #else
+    #define EXP_TEMPLATE_DISAMBIG
+  #endif
+#else
+  // for unknown compilers:
+  #define EXP_TEMPLATE_DISAMBIG
+#endif
+
 ////////////////////////////////////////////////////
 // safe comparison on primitive integral types
 namespace safe_compare_detail {
@@ -81,7 +107,7 @@ constexpr less_than(const T & lhs, const U & rhs) {
     return safe_compare_detail::less_than<
         std::is_signed<T>::value,
         std::is_signed<U>::value
-    >::template invoke(lhs, rhs);
+    >::EXP_TEMPLATE_DISAMBIG invoke(lhs, rhs);
 }
 
 template<class T, class U>
@@ -161,7 +187,7 @@ constexpr equal(const T & lhs, const U & rhs) {
     return safe_compare_detail::equal<
         std::numeric_limits<T>::is_signed,
         std::numeric_limits<U>::is_signed
-    >::template invoke(lhs, rhs);
+    >::EXP_TEMPLATE_DISAMBIG invoke(lhs, rhs);
 }
 
 template<class T, class U>

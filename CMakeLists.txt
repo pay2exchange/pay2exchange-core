@@ -43,6 +43,8 @@ endif()
 
 list( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules" )
 
+add_compile_options(-w)
+
 include(CheckCCompilerFlag)
 include(Utils)
 
@@ -184,7 +186,7 @@ set( GRAPHENE_EGENESIS_JSON "${CMAKE_CURRENT_SOURCE_DIR}/libraries/egenesis/gene
 
 if (USE_PCH)
   include (cotire)
-endif(USE_PCH)
+endif(USE_PCH)  
 
 option(USE_PROFILER "Build with GPROF support(Linux)." OFF)
 

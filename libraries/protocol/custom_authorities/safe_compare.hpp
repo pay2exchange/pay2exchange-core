@@ -15,6 +15,8 @@
 #include <type_traits>
 #include <limits>
 
+#define COMPILER_WORD_TEMPLATE 
+
 namespace boost {
 namespace safe_numerics {
 namespace safe_compare {
@@ -81,7 +83,7 @@ constexpr less_than(const T & lhs, const U & rhs) {
     return safe_compare_detail::less_than<
         std::is_signed<T>::value,
         std::is_signed<U>::value
-    >::template invoke(lhs, rhs);
+    > COMPILER_WORD_TEMPLATE ::invoke(lhs, rhs);
 }
 
 template<class T, class U>
@@ -161,7 +163,7 @@ constexpr equal(const T & lhs, const U & rhs) {
     return safe_compare_detail::equal<
         std::numeric_limits<T>::is_signed,
         std::numeric_limits<U>::is_signed
-    >::template invoke(lhs, rhs);
+    >:: COMPILER_WORD_TEMPLATE invoke(lhs, rhs);
 }
 
 template<class T, class U>

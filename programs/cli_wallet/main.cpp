@@ -242,7 +242,7 @@ int main( int argc, char** argv )
 
       auto wapiptr = std::make_shared<wallet_api>( wdata, remote_api );
       wapiptr->set_wallet_filename( wallet_file.generic_string() );
-      wapiptr->load_wallet_file();
+         wapiptr->load_wallet_file();
 
       fc::api<wallet_api> wapi(wapiptr);
 

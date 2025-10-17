@@ -245,6 +245,7 @@ add_compiler_flag_if_available("-Wunused-but-set-parameter")
 
 # libraries/protocol/custom_authorities/safe_compare.hpp see EXP_TEMPLATE_DISAMBIG
 # (despite this setting, some new compilers will hard abort anyway, so we fix the C++ code too, in that file)
+# see i.e. https://github.com/llvm/llvm-project/issues/94194
 add_compiler_flag_if_available("-Wno-error=missing-template-arg-list-after-template-kw")
 
 if( WIN32 )

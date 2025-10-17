@@ -19,13 +19,15 @@ namespace boost {
 namespace safe_numerics {
 namespace safe_compare {
 
-// some (broken) compilers needed extra word "template" in some c++ expressions
-// other ones allow it but do not need it (ignore it)
-// while most new have it as diagnostic, of them some can not be ignored
+// 1) some (broken, old MSVC?) compilers needed extra word "template" in some c++ expressions
+// 2) other compilers do not need it, but allow it silently or with mild warning
+// 3) others enforce correct C++ language, and the extra word will break compilation (new clang20 i.e.)
 // the correct C++ is to define this macro to nothing "", so to not use the extra word "template" in this places
+// here we enable the extra word if we think compiler needs it, or if it was done that way on that compilers before in this project
 #if defined(_MSC_VER)
   // MSVC historically permissive — keep the token for compatibility
   #define EXP_TEMPLATE_DISAMBIG template
+	// TODO one day on new MSVC we can also drop it
 #elif defined(__clang__)
   // Treat Clang <= 19 (especially 18) as "old"
   #if __clang_major__ <= 19
@@ -207,5 +209,7 @@ constexpr bool not_equal(const T & lhs, const U & rhs) {
 } // safe_compare
 } // safe_numerics
 } // boost
+
+#undef EXP_TEMPLATE_DISAMBIG
 
 #endif // BOOST_NUMERIC_SAFE_COMPARE_HPP

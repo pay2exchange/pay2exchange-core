@@ -19,6 +19,7 @@ namespace boost {
 namespace safe_numerics {
 namespace safe_compare {
 
+// related to: missing-template-arg-list-after-template-kw
 // 1) some (broken, old MSVC?) compilers needed extra word "template" in some c++ expressions
 // 2) other compilers do not need it, but allow it silently or with mild warning
 // 3) others enforce correct C++ language, and the extra word will break compilation (new clang20 i.e.)

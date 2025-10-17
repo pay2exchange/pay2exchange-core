@@ -13,6 +13,10 @@ if $jobs_arg_forced; then
   echo "Jobs was forced via argument: $jobs"
 fi
 
-echo "using $jobs jobs"
+echo "======================================================================"
+echo "Using $jobs job(s), using CXX=$CXX, CC=$CC."
 set -x
 time cmake -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_C_COMPILER_LAUNCHER=ccache  -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DMANUAL_SUBMODULES=1  .    && printf "\n\n\nmake with $jobs jobs.\n\n" && time make -j ${jobs}
+echo "======================================================================"
+echo "Using $jobs job(s), using CXX=$CXX, CC=$CC."
+echo "Finished"

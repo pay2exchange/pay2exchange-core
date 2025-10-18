@@ -6,6 +6,11 @@ endif()
 target_link_libraries( size_checker
                        PRIVATE graphene_chain graphene_egenesis_none fc ${CMAKE_DL_LIBS} ${PLATFORM_SPECIFIC_LIBS} )
 
+# Ensure size_checker depends on external projects to prevent race conditions in parallel builds
+if(NOT WIN32)
+  add_dependencies(size_checker project_editline project_secp256k1)
+endif(NOT WIN32)
+
 install( TARGETS
    size_checker
 

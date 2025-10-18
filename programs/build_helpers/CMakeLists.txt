@@ -27,3 +27,8 @@ endif()
 target_link_libraries( member_enumerator PRIVATE fc graphene_app graphene_net graphene_chain graphene_egenesis_brief
                                                  graphene_utilities graphene_wallet ${CMAKE_DL_LIBS}
                                                  ${PLATFORM_SPECIFIC_LIBS} )
+
+# Ensure member_enumerator depends on editline external project to prevent race conditions in parallel builds
+if(NOT WIN32)
+  add_dependencies(member_enumerator project_editline)
+endif(NOT WIN32)

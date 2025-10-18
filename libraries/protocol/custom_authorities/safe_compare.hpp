@@ -19,6 +19,35 @@ namespace boost {
 namespace safe_numerics {
 namespace safe_compare {
 
+// related to: missing-template-arg-list-after-template-kw
+// 1) some (broken, old MSVC?) compilers needed extra word "template" in some c++ expressions
+// 2) other compilers do not need it, but allow it silently or with mild warning
+// 3) others enforce correct C++ language, and the extra word will break compilation (new clang20 i.e.)
+// the correct C++ is to define this macro to nothing "", so to not use the extra word "template" in this places
+// here we enable the extra word if we think compiler needs it, or if it was done that way on that compilers before in this project
+#if defined(_MSC_VER)
+  // MSVC historically permissive — keep the token for compatibility
+  #define EXP_TEMPLATE_DISAMBIG template
+	// TODO one day on new MSVC we can also drop it
+#elif defined(__clang__)
+  // Treat Clang <= 19 (especially 18) as "old"
+  #if __clang_major__ <= 19
+    #define EXP_TEMPLATE_DISAMBIG template
+  #else
+    #define EXP_TEMPLATE_DISAMBIG
+  #endif
+#elif defined(__GNUC__)
+  // Treat GCC <= 14 (especially 13) as "old"
+  #if __GNUC__ <= 13
+    #define EXP_TEMPLATE_DISAMBIG template
+  #else
+    #define EXP_TEMPLATE_DISAMBIG
+  #endif
+#else
+  // for unknown compilers:
+  #define EXP_TEMPLATE_DISAMBIG
+#endif
+
 ////////////////////////////////////////////////////
 // safe comparison on primitive integral types
 namespace safe_compare_detail {
@@ -81,7 +110,7 @@ constexpr less_than(const T & lhs, const U & rhs) {
     return safe_compare_detail::less_than<
         std::is_signed<T>::value,
         std::is_signed<U>::value
-    >::template invoke(lhs, rhs);
+    >::EXP_TEMPLATE_DISAMBIG invoke(lhs, rhs);
 }
 
 template<class T, class U>
@@ -161,7 +190,7 @@ constexpr equal(const T & lhs, const U & rhs) {
     return safe_compare_detail::equal<
         std::numeric_limits<T>::is_signed,
         std::numeric_limits<U>::is_signed
-    >::template invoke(lhs, rhs);
+    >::EXP_TEMPLATE_DISAMBIG invoke(lhs, rhs);
 }
 
 template<class T, class U>
@@ -181,5 +210,7 @@ constexpr bool not_equal(const T & lhs, const U & rhs) {
 } // safe_compare
 } // safe_numerics
 } // boost
+
+#undef EXP_TEMPLATE_DISAMBIG
 
 #endif // BOOST_NUMERIC_SAFE_COMPARE_HPP

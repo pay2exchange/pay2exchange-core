@@ -12,9 +12,9 @@ endif()
 target_link_libraries( cli_wallet
       PRIVATE graphene_app graphene_net graphene_chain graphene_egenesis_brief graphene_utilities graphene_wallet fc ${CMAKE_DL_LIBS} ${PLATFORM_SPECIFIC_LIBS} )
 
-# Ensure cli_wallet depends on editline external project to prevent race conditions in parallel builds
+# Ensure cli_wallet depends on external projects to prevent race conditions in parallel builds
 if(NOT WIN32)
-  add_dependencies(cli_wallet project_editline)
+  add_dependencies(cli_wallet project_editline project_secp256k1)
 endif(NOT WIN32)
 
 if(MSVC)

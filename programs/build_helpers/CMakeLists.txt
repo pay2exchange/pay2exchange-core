@@ -28,7 +28,7 @@ target_link_libraries( member_enumerator PRIVATE fc graphene_app graphene_net gr
                                                  graphene_utilities graphene_wallet ${CMAKE_DL_LIBS}
                                                  ${PLATFORM_SPECIFIC_LIBS} )
 
-# Ensure member_enumerator depends on editline external project to prevent race conditions in parallel builds
+# Ensure member_enumerator depends on external projects to prevent race conditions in parallel builds
 if(NOT WIN32)
-  add_dependencies(member_enumerator project_editline)
+  add_dependencies(member_enumerator project_editline project_secp256k1)
 endif(NOT WIN32)

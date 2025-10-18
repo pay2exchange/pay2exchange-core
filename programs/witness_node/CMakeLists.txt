@@ -16,9 +16,9 @@ PRIVATE graphene_app graphene_delayed_node graphene_account_history graphene_ela
         graphene_api_helper_indexes graphene_custom_operations
         fc ${CMAKE_DL_LIBS} ${PLATFORM_SPECIFIC_LIBS} )
 
-# Ensure witness_node depends on editline external project to prevent race conditions in parallel builds
+# Ensure witness_node depends on external projects to prevent race conditions in parallel builds
 if(NOT WIN32)
-  add_dependencies(witness_node project_editline)
+  add_dependencies(witness_node project_editline project_secp256k1)
 endif(NOT WIN32)
 
 if (MSVC)

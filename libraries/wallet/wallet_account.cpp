@@ -29,8 +29,6 @@
 #include <graphene/wallet/wallet.hpp>
 #include <graphene/protocol/pts_address.hpp>
 
-moooooo! test compile fail
-
 /****
  * Wallet API methods to handle accounts
  */

@@ -7,6 +7,5 @@ if ! jobs=$(./make-get-jobs 2048 110 0 256 2>/dev/stderr); then
   exit 1
 fi
 
-echo "Captured: $jobs"
-echo "JOBS IS [$jobs]"
+echo "$jobs"
 

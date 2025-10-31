@@ -32,7 +32,7 @@ jobsmax=$(./make-get-jobs-here) || { fail "Can not calculate max jobs" ; }
 log_ok "Max jobs will be: $jobsmax"
 
 function do_clean_git() {
-	git submodule foreach --recursive 'git clean -xdf' || { fail "Can not clean git." ; }
+	git clean -xdf && git submodule foreach --recursive 'git clean -xdf' && echo "CLEAN OK" || { fail "Can not clean git." ; }
 	log_ok "Clean done"
 }
 

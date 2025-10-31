@@ -41,3 +41,8 @@ object_database/*
 
 *.pyc
 *.pyo
+.ninja_deps
+.ninja_lock
+.ninja_log
+build.ninja
+log.txt

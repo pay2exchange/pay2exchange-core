@@ -1,0 +1,12 @@
+
+#!/bin/bash
+
+# capture stdout into jobs, send child's stderr to our stderr
+if ! jobs=$(./make-get-jobs 2048 110 0 256 2>/dev/stderr); then
+  echo "ERROR" >&2
+  exit 1
+fi
+
+echo "Captured: $jobs"
+echo "JOBS IS [$jobs]"
+

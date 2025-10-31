@@ -1,0 +1,41 @@
+#!/bin/bash
+#will output a short kitname suitable to put in dirname for build dir
+#wibe, checked
+
+# : "${CXX:?"CXX must be set"}"
+
+if [ -z "${CXX:-}" ]; then kitname="auto"; echo "$kitname" ; exit 0; fi
+
+# normalize leading tilde to $HOME but leave other tildes alone
+cxx_path="$CXX"
+cxx_path="${cxx_path/#\~/$HOME}"
+
+cxx_name="${cxx_path##*/}"
+
+prefix="unknown-"
+
+# detect prefixes in a sensible order
+case "$cxx_path" in
+  /usr/bin/*|/usr/sbin/*|/bin/*|/sbin/*)
+    prefix="sys-" ;;
+  /usr/local/bin/*|/usr/local/sbin/*|/usr/local/*|/bin/local/*)
+    prefix="local-" ;;
+  /opt/*)
+    prefix="opt-" ;;
+  "$HOME/.local/"*)
+    prefix="homelocal-" ;;
+  "$HOME"/*)
+    prefix="home-" ;;
+  */*)
+    prefix="misc-" ;;
+  *)
+    prefix="find-" ;;
+esac
+
+kitname="${prefix}${cxx_name}"
+
+
+# sanitize
+kitname="$(printf '%s' "$kitname" | sed 's/[^A-Za-z0-9._+-]/X/g')"
+echo "$kitname"
+

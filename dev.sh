@@ -36,10 +36,16 @@ if $jobs_arg_forced; then
   echo "Jobs was forced via argument: $jobs"
 fi
 
+kitname=$(./kitname)
+kitname="$(printf '%s' "$kitname" | sed 's/[^A-Za-z0-9._+-]/X/g')" # sanitize
+
 function do_build() {
-	cmake -DCMAKE_BUILD_TYPE=Debug -G Ninja -DCMAKE_C_COMPILER_LAUNCHER=ccache  -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DMANUAL_SUBMODULES=1  . || fail "cmake failed"
-    	printf "\n\n\nmake with $jobs jobs.\n\n"
-	time ninja -j ${jobs} || fail "main build failed"
+	build_dir="build-term-$kitname"
+	banner="Build for CXX=$CXX (kitname=$kitname) jobs=$jobs"
+	log_ok "$banner - starting build"
+	cmake -S . -B "$build_dir" -S . -DCMAKE_BUILD_TYPE=Debug -G Ninja -DCMAKE_C_COMPILER_LAUNCHER=ccache  -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DMANUAL_SUBMODULES=1  || fail "$banner - cmake failed"
+	time ninja -C "$build_dir" -j ${jobs} -k0 || fail "$banner - build (generator, after cmake) failed"
+	log_ok "$banner - DONE"
 }
 
 echo "======================================================================"

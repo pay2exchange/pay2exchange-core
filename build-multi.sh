@@ -1,5 +1,13 @@
 #!/bin/bash
 
+
+tz_hour="$(date +%z | cut -c1-3)"
+start_text="$(printf '%s %s\n' "$(date +%F)${tz_hour}" "Starting test of builds")"
+log_fn="${PWD}/log.txt"
+
+echo "$start_text" > "$log_fn"
+log_ok "$start_text"
+
 function log_fail() {
 	if [ "$(tput colors)" -ge 256 ]; then
 		BG="\e[48;5;229m"  # light yellow
@@ -9,7 +17,7 @@ function log_fail() {
 	FG="$(tput setaf 1)"      # red text
 	RESET="$(tput sgr0)"
 
-	printf -- "$*\n" | tee -a log.txt | while read -r l; do echo -e "${BG}${FG}${l}${RESET}"; done
+	printf -- "$*\n" | tee -a "$log_fn" | while read -r l; do echo -e "${BG}${FG}${l}${RESET}"; done
 }
 
 function fail() {
@@ -19,14 +27,10 @@ function fail() {
 }
 
 function log_ok() {
-	printf -- "$*\n" | tee -a log.txt | while read -r l; do echo "$(tput setab 10)$(tput setaf 0)$l$(tput sgr0)"; done
+	printf -- "$*\n" | tee -a "$log_fn" | while read -r l; do echo "$(tput setab 10)$(tput setaf 0)$l$(tput sgr0)"; done
 }
 
-tz_hour="$(date +%z | cut -c1-3)"
-start_text="$(printf '%s %s\n' "$(date +%F)${tz_hour}" "Starting test of builds")"
 
-echo "$start_text" > log.txt
-log_ok "$start_text"
 
 jobsmax=$(./make-get-jobs-here) || { fail "Can not calculate max jobs" ; }
 log_ok "Max jobs will be: $jobsmax"

@@ -14,32 +14,9 @@ jobsmax=$(./make-get-jobs-here) || { fail "Can not calculate max jobs" ; }
 log_ok "Max jobs will be: $jobsmax"
 
 function do_clean_git() {
-	OLD_EXCLUDE=$(git config --get-all clean.exclude || true)
-
-	restore_exclude() {
-		git config --unset-all clean.exclude || true
-		if [ -n "$OLD_EXCLUDE" ]; then
-			while IFS= read -r line; do
-			git config --add clean.exclude "$line" || fail "could not restore clean.exclude entry"
-		done <<< "$OLD_EXCLUDE"
-		fi
-		log_ok "restored previous git clean.exclude"
-	}
-
-	# register trap so Ctrl-C or errors still restore
-	trap restore_exclude EXIT INT TERM
-
-	# add temporary exclusion
-	git config --add clean.exclude 'log*.txt' || fail "could not add git clean temporary exclusion"
-	log_ok "saved current git clean.exclude and added temporary exclusion"
-
-	git clean -xdf && git submodule foreach --recursive 'git clean -xdf' && echo "CLEAN OK" || { fail "Can not clean git." ; }
-
-	# --- manual restore at the end ---
-	restore_exclude || fail "manual restore (of git clean excluse) failed"
-	trap - EXIT INT TERM # now unregister the trap so it won't run again
-
-	log_ok "Clean done"
+	exclude='log*.txt'
+	git clean -xdf --exclude="$exclude" && git submodule foreach --recursive "git clean -xdf  --exclude='$exclude'" && log_ok "CLEAN OK (git clean)" || { fail "Can not clean git." ; }
+	log_ok "Clean done (git clean)"
 }
 
 

@@ -1,27 +1,17 @@
 #!/bin/bash
 echo "This is the script for Developer of application, to build it"
 
-function log_fail() {
-	if [ "$(tput colors)" -ge 256 ]; then
-		BG="\e[48;5;229m"  # light yellow
-	else
-		BG="$(tput setab 3)"  # standard yellow
-	fi
-	FG="$(tput setaf 1)"      # red text
-	RESET="$(tput sgr0)"
+tz_hour="$(date -u +%z | cut -c1-3)"
+start_text="$(printf '%s %s\n' "$(date +%F)${tz_hour}" "Starting test of builds")"
+main_pwd="${PWD}"
+log_fn="${main_pwd}/log-devbuild.txt"
+echo "Logging into [$log_fn]"
+echo "$start_text" > "$log_fn"
+log_ok "$start_text start the multi build"
 
-	printf -- "$*\n" | tee -a log | while read -r l; do echo -e "${BG}${FG}${l}${RESET}"; done
-}
+source ./lib-sh-log.sh  || { echo "Can not load lib... it is not here nor in up-dir" ; exit 1 ; }
+#source ./lib-sh-log.sh || source ../lib-sh-log.sh || { echo "Can not load lib... it is not here nor in up-dir" ; exit 1 ; }
 
-function fail() {
-	log_fail "$@"
-	echo "$@" "- exiting" >&2
-	exit 1
-}
-
-function log_ok() {
-	printf -- "$*\n" | tee -a log | while read -r l; do echo "$(tput setab 10)$(tput setaf 0)$l$(tput sgr0)"; done
-}
 
 jobs=$(./make-get-jobs 2048 110 0 256)
 

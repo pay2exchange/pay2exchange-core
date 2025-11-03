@@ -1,12 +1,12 @@
 #!/bin/bash
 
-
-tz_hour="$(date +%z | cut -c1-3)"
+tz_hour="$(date -u +%z | cut -c1-3)"
 start_text="$(printf '%s %s\n' "$(date +%F)${tz_hour}" "Starting test of builds")"
-log_fn="${PWD}/log.txt"
-
+main_pwd="${PWD}"
+log_fn="${main_pwd}/log-multibuild.txt"
+echo "Logging into [$log_fn]"
 echo "$start_text" > "$log_fn"
-log_ok "$start_text"
+log_ok "$start_text start the multi build"
 
 function log_fail() {
 	if [ "$(tput colors)" -ge 256 ]; then
@@ -17,7 +17,16 @@ function log_fail() {
 	FG="$(tput setaf 1)"      # red text
 	RESET="$(tput sgr0)"
 
-	printf -- "$*\n" | tee -a "$log_fn" | while read -r l; do echo -e "${BG}${FG}${l}${RESET}"; done
+	timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+	shortbanner="$0: $timestamp: "
+	echo "(log goes to: $log_fn)"
+	printf -- "$shortbanner $*\n" | tee -a "$log_fn" | while read -r l; do echo -e "${BG}${FG}${l}${RESET}"; done
+}
+
+function log_ok() {
+	timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+	shortbanner="$0: $timestamp: "
+	printf -- "($shortbanner log goes to $log_fn) - $*\n" | tee -a "$log_fn" | while read -r l; do echo "$(tput setab 10)$(tput setaf 0)$l$(tput sgr0)"; done
 }
 
 function fail() {
@@ -26,9 +35,6 @@ function fail() {
 	exit 1
 }
 
-function log_ok() {
-	printf -- "$*\n" | tee -a "$log_fn" | while read -r l; do echo "$(tput setab 10)$(tput setaf 0)$l$(tput sgr0)"; done
-}
 
 
 
@@ -90,7 +96,7 @@ function build_by_j() {
 	for var_jobs in "${seq[@]}"
 	do
 		do_clean_git || fail "Can not clean"
-		echo "Build with jobs: $var_jobs"
+		log_ok "Build with jobs: $var_jobs"
 		bash dev.sh --jobs=$var_jobs && log_ok "Worked ok for jobs=$var_jobs with CC=$CC CXX=$CXX" || fail "Failed build wih jobs=$var_jobs"
 	done
 }
@@ -102,7 +108,9 @@ function build_by_kit() {
 	log_ok "Kit $1 - DONE"
 }
 
+log_ok "Will stat bulding all the kits now..."
 build_by_kit ~/use-clang-18
 build_by_kit ~/use-clang-20
 build_by_kit ~/use-gcc
+log_ok "This is all, bye."
 

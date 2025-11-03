@@ -48,6 +48,49 @@ include(Utils)
 
 include(LinkerChoice)
 
+set(_use_ccache_values "auto" "true" "false" "disable_launcher")
+set(USE_CCACHE "auto" CACHE STRING
+    "Control use of ccache:
+     - auto: use ccache if installed (warn if not found)
+     - true: always require ccache (error if not found)
+     - false: do not use ccache
+     - disable_launcher: force unset compiler launchers to make more sure ccache is NOT used"
+)
+set_property(CACHE USE_CCACHE PROPERTY STRINGS ${_use_ccache_values})
+
+
+# Normalize to lowercase
+string(TOLOWER "${USE_CCACHE}" USE_CCACHE)
+
+if(USE_CCACHE STREQUAL "auto")
+    find_program(CCACHE_PROGRAM ccache)
+    if(CCACHE_PROGRAM)
+        message(STATUS "USE_CCACHE=auto: found ccache, enabling it")
+        set(CMAKE_C_COMPILER_LAUNCHER   "${CCACHE_PROGRAM}")
+        set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+    else()
+        message(WARNING "USE_CCACHE=auto: ccache not found, but recommended for faster builds")
+    endif()
+
+elseif(USE_CCACHE STREQUAL "true")
+    find_program(CCACHE_PROGRAM ccache REQUIRED)
+    message(STATUS "USE_CCACHE=true: forcing use of ccache")
+    set(CMAKE_C_COMPILER_LAUNCHER   "${CCACHE_PROGRAM}")
+    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+
+elseif(USE_CCACHE STREQUAL "false")
+    message(WARNING "USE_CCACHE=false: not changing LAUNCHE")
+
+elseif(USE_CCACHE STREQUAL "disable_launcher")
+    message(WARNING "USE_CCACHE=disable_launcher: explicitly disabling compiler launchers")
+    set(CMAKE_C_COMPILER_LAUNCHER   "")
+    set(CMAKE_CXX_COMPILER_LAUNCHER "")
+
+else()
+    message(FATAL_ERROR "Invalid value for USE_CCACHE: ${USE_CCACHE}. Allowed: auto, true, false, disable_launcher")
+endif()
+
+
 # function to help with cUrl
 macro(FIND_CURL)
    if (NOT WIN32 AND NOT APPLE AND CURL_STATICLIB)
@@ -413,3 +456,34 @@ endif(ENABLE_INSTALLER)
 MESSAGE( STATUS "" )
 MESSAGE( STATUS "PROFILER: ${USE_PROFILER}" )
 MESSAGE( STATUS "" )
+
+message(STATUS "========== Build Configuration Summary (top of $PROJECT_NAME) ==========")
+message(STATUS "Project: ${PROJECT_NAME}")
+message(STATUS "Generator: ${CMAKE_GENERATOR}")
+if(CMAKE_GENERATOR_PLATFORM)
+    message(STATUS "Generator Platform: ${CMAKE_GENERATOR_PLATFORM}")
+endif()
+if(CMAKE_GENERATOR_TOOLSET)
+    message(STATUS "Generator Toolset: ${CMAKE_GENERATOR_TOOLSET}")
+endif()
+
+# Compilers
+message(STATUS "C Compiler:   ${CMAKE_C_COMPILER}")
+message(STATUS "C++ Compiler: ${CMAKE_CXX_COMPILER}")
+
+if(DEFINED CMAKE_C_COMPILER_LAUNCHER AND NOT "${CMAKE_C_COMPILER_LAUNCHER}" STREQUAL "")
+    message(STATUS "C Compiler Launcher:   ${CMAKE_C_COMPILER_LAUNCHER}")
+else()
+    message(STATUS "C Compiler Launcher:   (none)")
+endif()
+if(DEFINED CMAKE_CXX_COMPILER_LAUNCHER AND NOT "${CMAKE_CXX_COMPILER_LAUNCHER}" STREQUAL "")
+    message(STATUS "C++ Compiler Launcher: ${CMAKE_CXX_COMPILER_LAUNCHER}")
+else()
+    message(STATUS "C++ Compiler Launcher: (none)")
+endif()
+
+# Compiler flags
+message(STATUS "C Flags:   ${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
+message(STATUS "C++ Flags: ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
+
+message(STATUS "=================================================")

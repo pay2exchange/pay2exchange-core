@@ -7,11 +7,9 @@ main_pwd="${PWD}"
 log_fn="${main_pwd}/log-devbuild.txt"
 echo "Logging into [$log_fn]"
 echo "$start_text" > "$log_fn"
-log_ok "$start_text start the multi build"
-
 source ./lib-sh-log.sh  || { echo "Can not load lib... it is not here nor in up-dir" ; exit 1 ; }
 #source ./lib-sh-log.sh || source ../lib-sh-log.sh || { echo "Can not load lib... it is not here nor in up-dir" ; exit 1 ; }
-
+log_ok "$start_text start the multi build"
 
 jobs=$(./make-get-jobs 2048 110 0 256)
 

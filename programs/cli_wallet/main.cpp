@@ -53,8 +53,6 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <websocketpp/version.hpp>
 
-#include <graphene/chain/genesis_state.hpp> // to load genesis from json
-
 #ifdef WIN32
 # include <signal.h>
 #else
@@ -125,74 +123,6 @@ void setup_logging(string console_level, bool file_logger, string file_level, st
    }
 }
 
-using namespace graphene::chain;
-
-std::string load_chainid_from_json(const std::string& genesis_filename) {
-  try {
-    genesis_state_type genesis = fc::json::from_file(genesis_filename).as<genesis_state_type>(GRAPHENE_MAX_NESTED_OBJECTS);
-
-    // --- normalize
-    // Ensure blockchain parameters are valid
-    genesis.initial_parameters.validate();
-
-    // Ensure fee schedule is initialized
-    genesis.initial_parameters.get_current_fees();
-
-    // Ensure timestamp is set
-    if (genesis.initial_timestamp.sec_since_epoch() == 0) throw std::runtime_error("Loaded genesis json has time 0");
-  
-
-    // Accounts: sort by account name
-    std::sort(genesis.initial_accounts.begin(), genesis.initial_accounts.end(),
-              [](const genesis_state_type::initial_account_type& a,
-                 const genesis_state_type::initial_account_type& b) {
-                  return a.name < b.name;
-              });
-
-    // Assets: sort by symbol
-    std::sort(genesis.initial_assets.begin(), genesis.initial_assets.end(),
-              [](const genesis_state_type::initial_asset_type& a,
-                 const genesis_state_type::initial_asset_type& b) {
-                  return a.symbol < b.symbol;
-              });
-    // Committee candidates: sort by owner_name
-    std::sort(genesis.initial_committee_candidates.begin(),
-              genesis.initial_committee_candidates.end(),
-              [](const genesis_state_type::initial_committee_member_type& a,
-                 const genesis_state_type::initial_committee_member_type& b) {
-                  return a.owner_name < b.owner_name;
-              });
-
-
-    // Witness candidates: sort by account name
-    std::sort(genesis.initial_witness_candidates.begin(),
-              genesis.initial_witness_candidates.end(),
-              [](const genesis_state_type::initial_witness_type& a,
-                 const genesis_state_type::initial_witness_type& b) {
-                  return a.owner_name < b.owner_name;
-              });
-
-    // Worker candidates: sort by account name
-    std::sort(genesis.initial_worker_candidates.begin(),
-              genesis.initial_worker_candidates.end(),
-              [](const genesis_state_type::initial_worker_type& a,
-                 const genesis_state_type::initial_worker_type& b) {
-                  return a.owner_name < b.owner_name;
-              });
-
-    // ---
-
-    chain_id_type chain_id = genesis.compute_chain_id();
-    std::cout << "Chain ID (norm): " << std::string(chain_id) << std::endl;
-    return std::string(chain_id);
-  }
-  catch (const fc::exception& e) {
-    std::cerr << "Error loading genesis file: " << e.to_detail_string() << std::endl;
-    throw std::runtime_error("Failed to load genesis");
-  }
-}
-
-
 int main( int argc, char** argv )
 {
    fc::print_stacktrace_on_segfault();
@@ -216,11 +146,6 @@ int main( int argc, char** argv )
          ("daemon,d", "Run the wallet in daemon mode" )
          ("wallet-file,w", bpo::value<string>()->implicit_value("wallet.json"), "wallet to load")
          ("chain-id", bpo::value<string>(), "chain ID to connect to")
-         ("exit", "Exit after running commands such as printing id, before main loop")
-
-         ("write-chainid", bpo::value<string>(), "filename of file to save chain-id into (if not-empty, by default empty)")
-         ("read-genesis-json", bpo::value<string>(), "filename of file with genesis json to load (for option write-chainid)")
-
          ("suggest-brain-key", "Suggest a safe brain key to use for creating your account")
          ("logs-rpc-console-level", bpo::value<string>()->default_value("info"),
                "Level of console logging. Allowed levels: info, debug, warn, error, all")
@@ -296,24 +221,6 @@ int main( int argc, char** argv )
             wdata.chain_id = graphene::egenesis::get_egenesis_chain_id();
             std::cout << "Starting a new wallet with chain ID " << wdata.chain_id.str() << " (from egenesis)\n";
          }
-      }
-
-      const auto opt_write_chainid = [&options]() -> std::string {
-        if (options.count("write-chainid")) return options.at("write-chainid").as<string>();
-        return "";
-      }();
-
-      if (opt_write_chainid != "") {
-        const auto read_genesis = options.at("read-genesis-json").as<string>();
-        const std::string chainid = load_chainid_from_json(read_genesis);
-        std::ofstream idfile(opt_write_chainid);
-        idfile << chainid << "\n";
-        std::cout << "Saved chainid ["<<chainid<<"] to [" << opt_write_chainid << "]\n";
-      }
-
-      if ( options.count("exit") > 0 ) {
-        std::cout << "As ordered: exit now.\n";
-        return 0;
       }
 
       // but allow CLI to override

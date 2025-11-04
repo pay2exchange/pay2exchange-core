@@ -92,6 +92,10 @@ int main(int argc, char** argv) {
             ("data-dir,d", bpo::value<boost::filesystem::path>()->default_value("witness_node_data_dir"),
                     "Directory containing databases, configuration file, etc.")
             ("version,v", "Display version information")
+            ("write-chainid", bpo::value<std::string>(),
+              "Write the chain ID into this file name (also will create same filename plus .done to signal that it is done)")
+            ("exit", "Exit after startup (useful for option write-chainid)")
+            ("minimal", "Minimal startup, do not load almost any plugins - just enough to calculate chainID")
             ("plugins", bpo::value<std::string>()->default_value(default_plugins),
                     "Space-separated list of plugins to activate")
             ("ignore-api-helper-indexes-warning", "Do not exit if api_helper_indexes plugin is not enabled.");
@@ -140,6 +144,7 @@ int main(int argc, char** argv) {
          return EXIT_FAILURE;
       }
 
+      const bool minimal = options.count("minimal") > 0;
       if( options.count("version") > 0 )
       {
          disable_default_logging();
@@ -176,6 +181,7 @@ int main(int argc, char** argv) {
       std::set<std::string> plugins;
       boost::split(plugins, options.at("plugins").as<std::string>(), [](char c){return c == ' ';});
 
+if (!minimal) { // ----- if not minimal mode ------
       if( plugins.count("account_history") > 0 && plugins.count("elasticsearch") > 0 ) {
          disable_default_logging();
          std::stringstream ss;
@@ -201,6 +207,7 @@ int main(int argc, char** argv) {
             node->enable_plugin(plug);
          }
       });
+} // ----- if not minimal mode ------
 
       bpo::notify(options);
 
@@ -230,13 +237,27 @@ int main(int argc, char** argv) {
       ilog("Started BitShares node on a chain with ${h} blocks.", ("h", node->chain_database()->head_block_num()));
       ilog("Chain ID is ${id}", ("id", node->chain_database()->get_chain_id()) );
 
-      auto caught_signal = exit_promise->wait();
-      ilog("Exiting from signal ${n}", ("n", caught_signal));
-      return EXIT_SUCCESS;
-   } catch( const fc::exception& e ) {
-      // deleting the node can yield, so do this outside the exception handler
-      unhandled_exception = e;
-   }
+      if (options.count("write-chainid")) {
+        const std::string fn = options["write-chainid"].as<std::string>();
+        ilog("Writing chain ID to file ${fn}", ("fn", fn));
+        std::ofstream out(fn);
+        out << node->chain_database()->get_chain_id().str();
+        out.close();
+        std::ofstream done(fn + ".done");
+        done.close();
+      }
+      if (options.count("exit")) {
+        ilog("Exiting due to option from command line");
+        return EXIT_SUCCESS;
+      }
+
+            auto caught_signal = exit_promise->wait();
+            ilog("Exiting from signal ${n}", ("n", caught_signal));
+            return EXIT_SUCCESS;
+         } catch( const fc::exception& e ) {
+            // deleting the node can yield, so do this outside the exception handler
+            unhandled_exception = e;
+         }
 
    if (unhandled_exception)
    {

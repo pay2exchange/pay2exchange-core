@@ -98,7 +98,7 @@ namespace graphene { namespace app {
                                   boost::program_options::options_description& configuration_file_options)const;
          void initialize(const fc::path& data_dir,
                          std::shared_ptr<boost::program_options::variables_map> options) const;
-         void startup();
+         void startup(bool minimal_mode = false);
 
          template<typename PluginType>
          std::shared_ptr<PluginType> register_plugin(bool auto_load = false) {

@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
             ("write-chainid", bpo::value<std::string>(),
               "Write the chain ID into this file name (also will create same filename plus .done to signal that it is done)")
             ("exit", "Exit after startup (useful for option write-chainid)")
-            ("minimal", "Minimal startup, do not load almost any plugins - just enough to calculate chainID")
+            ("minimal", "Minimal startup, do not load almost any plugins - just enough to calculate chainID, then exit")
             ("plugins", bpo::value<std::string>()->default_value(default_plugins),
                     "Space-separated list of plugins to activate")
             ("ignore-api-helper-indexes-warning", "Do not exit if api_helper_indexes plugin is not enabled.");
@@ -179,7 +179,12 @@ int main(int argc, char** argv) {
       graphene::app::load_configuration_options(data_dir, cfg_options, options);
 
       std::set<std::string> plugins;
-      boost::split(plugins, options.at("plugins").as<std::string>(), [](char c){return c == ' ';});
+      if (minimal) {
+         // For minimal mode, use no plugins at all - just enough to calculate chainID
+         plugins.clear();
+      } else {
+         boost::split(plugins, options.at("plugins").as<std::string>(), [](char c){return c == ' ';});
+      }
 
 if (!minimal) { // ----- if not minimal mode ------
       if( plugins.count("account_history") > 0 && plugins.count("elasticsearch") > 0 ) {
@@ -212,8 +217,24 @@ if (!minimal) { // ----- if not minimal mode ------
       bpo::notify(options);
 
       node->initialize(data_dir, sharable_options);
+      node->startup(minimal);
 
-      node->startup();
+      // Handle minimal mode after startup (chain database is now loaded)
+      if (minimal) {
+         ilog("Chain ID is ${id}", ("id", node->chain_database()->get_chain_id()));
+         
+         if (options.count("write-chainid")) {
+            const std::string fn = options["write-chainid"].as<std::string>();
+            ilog("Writing chain ID to file ${fn}", ("fn", fn));
+            std::ofstream out(fn);
+            out << node->chain_database()->get_chain_id().str();
+            out.close();
+            std::ofstream done(fn + ".done");
+            done.close();
+         }
+         
+         return EXIT_SUCCESS;
+      }
 
       fc::promise<int>::ptr exit_promise = fc::promise<int>::create("UNIX Signal Handler");
 

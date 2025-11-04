@@ -41,7 +41,7 @@ class application_impl : public net::node_delegate, public std::enable_shared_fr
       void set_api_limit();
 
       void initialize(const fc::path& data_dir, std::shared_ptr<boost::program_options::variables_map> options);
-      void startup();
+      void startup(bool minimal_mode = false);
 
       fc::optional< api_access_info > get_api_access_info(const string& username)const;
 

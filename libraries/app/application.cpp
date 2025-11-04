@@ -594,21 +594,24 @@ void application_impl::open_chain_database() const
    }
 } FC_LOG_AND_RETHROW() }
 
-void application_impl::startup()
+void application_impl::startup(bool minimal_mode)
 { try {
-   bool enable_p2p_network = true;
-   if( _options->count("enable-p2p-network") > 0 )
-      enable_p2p_network = _options->at("enable-p2p-network").as<bool>();
-
    open_chain_database();
 
-   startup_plugins();
+   if( !minimal_mode )
+   {
+      bool enable_p2p_network = true;
+      if( _options->count("enable-p2p-network") > 0 )
+         enable_p2p_network = _options->at("enable-p2p-network").as<bool>();
 
-   if( enable_p2p_network && _active_plugins.find( "delayed_node" ) == _active_plugins.end() )
-      reset_p2p_node(_data_dir);
+      startup_plugins();
 
-   reset_websocket_server();
-   reset_websocket_tls_server();
+      if( enable_p2p_network && _active_plugins.find( "delayed_node" ) == _active_plugins.end() )
+         reset_p2p_node(_data_dir);
+
+      reset_websocket_server();
+      reset_websocket_tls_server();
+   }
 } FC_LOG_AND_RETHROW() }
 
 optional< api_access_info > application_impl::get_api_access_info(const string& username)const
@@ -1359,12 +1362,18 @@ void application::initialize(const fc::path& data_dir,
    ilog( "Done initializing application" );
 }
 
-void application::startup()
+void application::startup(bool minimal_mode)
 {
    try {
-      ilog( "Starting up application" );
-      my->startup();
-      ilog( "Done starting up application" );
+      if( minimal_mode )
+         ilog( "Starting up application in minimal mode" );
+      else
+         ilog( "Starting up application" );
+      my->startup(minimal_mode);
+      if( minimal_mode )
+         ilog( "Done starting up application in minimal mode" );
+      else
+         ilog( "Done starting up application" );
    } catch ( const fc::exception& e ) {
       elog( "${e}", ("e",e.to_detail_string()) );
       throw;

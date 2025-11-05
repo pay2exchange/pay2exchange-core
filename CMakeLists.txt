@@ -487,3 +487,18 @@ message(STATUS "C Flags:   ${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}
 message(STATUS "C++ Flags: ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 
 message(STATUS "=================================================")
+
+
+if(UNIX)
+  set(BUILD_DIR "${CMAKE_BINARY_DIR}")
+
+  set(LINK_PATH "$ENV{PWD}/use")
+
+  add_custom_target(create_use_symlink ALL
+    COMMAND ${CMAKE_COMMAND} -E remove -f "${LINK_PATH}"
+    COMMAND ${CMAKE_COMMAND} -E create_symlink "${BUILD_DIR}" "${LINK_PATH}"
+    COMMENT "Creating symlink ${LINK_PATH} -> ${BUILD_DIR}"
+    VERBATIM
+  )
+endif()
+

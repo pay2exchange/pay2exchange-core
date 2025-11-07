@@ -66,6 +66,12 @@ using namespace graphene::wallet;
 using namespace std;
 namespace bpo = boost::program_options;
 
+/// Disable default logging
+void disable_default_logging()
+{
+   fc::configure_logging( fc::logging_config() );
+}
+
 fc::log_level string_to_level(string level)
 {
    fc::log_level result;
@@ -125,7 +131,15 @@ void setup_logging(string console_level, bool file_logger, string file_level, st
 
 int main( int argc, char** argv )
 {
+   const bool cfg_mutelog = [argc,argv]() -> bool {
+      for (int i=1; i<argc; ++i) if (std::strcmp(argv[i],"--mutelog")) return true;
+      return false;
+   }();
+
+   if (cfg_mutelog) disable_default_logging();
+
    fc::print_stacktrace_on_segfault();
+
    try {
 
       boost::program_options::options_description opts;
@@ -153,6 +167,7 @@ int main( int argc, char** argv )
          ("logs-rpc-file-level", bpo::value<string>()->default_value("debug"),
                "Level of file logging. Allowed levels: info, debug, warn, error, all")
          ("logs-rpc-file-name", bpo::value<string>()->default_value("rpc.log"), "File name for file rpc logs")
+         ("mutelog","Mute all messagesa from ilog elog and similar logging, especially keep the out of stdout pipe normal output")
          ("version,v", "Display version information");
 
       bpo::variables_map options;
@@ -184,8 +199,10 @@ int main( int argc, char** argv )
          return 0;
       }
 
+      if (!cfg_mutelog) {
       setup_logging(options.at("logs-rpc-console-level").as<string>(),options.at("logs-rpc-file").as<bool>(),
             options.at("logs-rpc-file-level").as<string>(), options.at("logs-rpc-file-name").as<string>());
+      }
 
       // TODO:  We read wallet_data twice, once in main() to grab the
       //    socket info, again in wallet_api when we do

@@ -167,6 +167,7 @@ int main( int argc, char** argv )
          ("logs-rpc-file-level", bpo::value<string>()->default_value("debug"),
                "Level of file logging. Allowed levels: info, debug, warn, error, all")
          ("logs-rpc-file-name", bpo::value<string>()->default_value("rpc.log"), "File name for file rpc logs")
+         ("cmd-pipe", bpo::value<string>(), "Provide two integers in format R,W such as 3,4 which are the FD of pipe from parent process to send commands (we read cmd from R, and we write replies to W)")
          ("mutelog","Mute all messagesa from ilog elog and similar logging, especially keep the out of stdout pipe normal output")
          ("version,v", "Display version information");
 
@@ -202,6 +203,27 @@ int main( int argc, char** argv )
       if (!cfg_mutelog) {
       setup_logging(options.at("logs-rpc-console-level").as<string>(),options.at("logs-rpc-file").as<bool>(),
             options.at("logs-rpc-file-level").as<string>(), options.at("logs-rpc-file-name").as<string>());
+      }
+
+      // Parse cmd-pipe option if provided
+      int cmd_pipe_read_fd = -1;
+      int cmd_pipe_write_fd = -1;
+      if( options.count("cmd-pipe") > 0 )
+      {
+         string pipe_spec = options.at("cmd-pipe").as<string>();
+         size_t comma_pos = pipe_spec.find(',');
+         if( comma_pos == string::npos )
+         {
+            std::cerr << "Error: cmd-pipe format should be R,W (e.g., 3,4)" << std::endl;
+            return 1;
+         }
+         try {
+            cmd_pipe_read_fd = std::stoi(pipe_spec.substr(0, comma_pos));
+            cmd_pipe_write_fd = std::stoi(pipe_spec.substr(comma_pos + 1));
+         } catch(const std::exception& e) {
+            std::cerr << "Error parsing cmd-pipe FDs: " << e.what() << std::endl;
+            return 1;
+         }
       }
 
       // TODO:  We read wallet_data twice, once in main() to grab the
@@ -319,6 +341,20 @@ int main( int argc, char** argv )
 
          for( auto& name_formatter : wapiptr->get_result_formatters() )
             wallet_cli->format_result( name_formatter.first, name_formatter.second );
+
+         // Setup pipe command provider if specified
+         if( cmd_pipe_read_fd != -1 && cmd_pipe_write_fd != -1 )
+         {
+            auto pipe_provider = std::make_shared<fc::rpc::cli_cmd_provider_pipe>(cmd_pipe_read_fd, cmd_pipe_write_fd);
+            std::cout << "Using commands from pipe: " << pipe_provider->get_short_info() << std::endl;
+            
+            auto cmd_function = std::make_shared<fc::rpc::cli::t_cmd_provider>(
+               [pipe_provider]() -> std::string {
+                  return pipe_provider->read_command();
+               });
+            
+            wallet_cli->set_read_hook(std::weak_ptr<fc::rpc::cli::t_cmd_provider>(cmd_function));
+         }
 
          std::cout << "\nType \"help\" for a list of available commands.\n";
          std::cout << "Type \"gethelp <command>\" for info about individual commands.\n\n";

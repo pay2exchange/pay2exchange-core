@@ -157,7 +157,7 @@ int main( int argc, char** argv )
                "PEM certificate for wallet websocket TLS RPC")
          ("rpc-http-endpoint,H", bpo::value<string>()->implicit_value("127.0.0.1:8093"),
                "Endpoint for wallet HTTP and websocket RPC to listen on")
-         ("daemon,d", "Run the wallet in daemon mode" )
+         ("daemon,d", "Run the wallet in daemon mode (see cmd-pipe option)" )
          ("wallet-file,w", bpo::value<string>()->implicit_value("wallet.json"), "wallet to load")
          ("chain-id", bpo::value<string>(), "chain ID to connect to")
          ("suggest-brain-key", "Suggest a safe brain key to use for creating your account")
@@ -167,7 +167,8 @@ int main( int argc, char** argv )
          ("logs-rpc-file-level", bpo::value<string>()->default_value("debug"),
                "Level of file logging. Allowed levels: info, debug, warn, error, all")
          ("logs-rpc-file-name", bpo::value<string>()->default_value("rpc.log"), "File name for file rpc logs")
-         ("cmd-pipe", bpo::value<string>(), "Provide two integers in format R,W such as 3,4 which are the FD of pipe from parent process to send commands (we read cmd from R, and we write replies to W)")
+         ("cmd-pipe", bpo::value<string>(),
+            "List of two integer such as \"5,6\" tha are the FD of pipe to read/write commands (see option: daemon)")
          ("mutelog","Mute all messagesa from ilog elog and similar logging, especially keep the out of stdout pipe normal output")
          ("version,v", "Display version information");
 
@@ -204,6 +205,9 @@ int main( int argc, char** argv )
       setup_logging(options.at("logs-rpc-console-level").as<string>(),options.at("logs-rpc-file").as<bool>(),
             options.at("logs-rpc-file-level").as<string>(), options.at("logs-rpc-file-name").as<string>());
       }
+
+      std::shared_ptr<fc::rpc::cli_cmd_provider_pipe> pipe_provider; // here to pin a large lifet-time
+      std::shared_ptr<fc::rpc::cli::t_cmd_provider> cmd_function; // here to pin a large lifet-time
 
       // Parse cmd-pipe option if provided
       int cmd_pipe_read_fd = -1;
@@ -342,13 +346,15 @@ int main( int argc, char** argv )
          for( auto& name_formatter : wapiptr->get_result_formatters() )
             wallet_cli->format_result( name_formatter.first, name_formatter.second );
 
+         std::cout << "------ wallet before pipe decission ------ \n"; 
          // Setup pipe command provider if specified
          if( cmd_pipe_read_fd != -1 && cmd_pipe_write_fd != -1 )
          {
-            auto pipe_provider = std::make_shared<fc::rpc::cli_cmd_provider_pipe>(cmd_pipe_read_fd, cmd_pipe_write_fd);
+            std::cout << "====== PIPE SETUP to receive cmd in wallet ====== \n"; 
+            pipe_provider = std::make_shared<fc::rpc::cli_cmd_provider_pipe>(cmd_pipe_read_fd, cmd_pipe_write_fd);
             std::cout << "Using commands from pipe: " << pipe_provider->get_short_info() << std::endl;
             
-            auto cmd_function = std::make_shared<fc::rpc::cli::t_cmd_provider>(
+            cmd_function = std::make_shared<fc::rpc::cli::t_cmd_provider>(
                [pipe_provider]() -> std::string {
                   return pipe_provider->read_command();
                });

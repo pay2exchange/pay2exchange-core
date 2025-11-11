@@ -43,6 +43,12 @@ endif()
 
 list( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules" )
 
+# --------
+  # FIX (for rare errors re missing lib editline)v Include top-level vendor validation system FIRST
+  # This prevents the recurring git clean -xdf + stale Makefile issue
+  include("${CMAKE_CURRENT_SOURCE_DIR}/cmake_top_level_vendor_validator.cmake")
+# --------
+
 include(CheckCCompilerFlag)
 include(Utils)
 
@@ -400,6 +406,18 @@ message(NOTICE "-----------------------------------------------")
 # -----------------------------------------------
 
 add_subdirectory( libraries )
+
+# --------
+  # FIX (for rare errors re missing lib editline)v Include top-level vendor validation system FIRST
+  # BUILD ORDER ENFORCEMENT: Libraries must complete before programs/tests
+  # This ensures vendor dependencies are fully built before any dependent targets
+
+  # After libraries are configured, create the project-wide vendor barrier
+  validate_fc_vendor_dependencies()
+  create_project_wide_vendor_barrier()
+# --------
+
+# Now programs and tests can safely depend on vendor libraries
 add_subdirectory( programs )
 add_subdirectory( tests )
 

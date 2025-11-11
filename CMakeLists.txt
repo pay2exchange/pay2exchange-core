@@ -46,7 +46,7 @@ list( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules" )
 # --------
   # FIX (for rare errors re missing lib editline)v Include top-level vendor validation system FIRST
   # This prevents the recurring git clean -xdf + stale Makefile issue
-  include("${CMAKE_CURRENT_SOURCE_DIR}/cmake_top_level_vendor_validator.cmake")
+  include(cmake_top_level_vendor_validator)
 # --------
 
 include(CheckCCompilerFlag)

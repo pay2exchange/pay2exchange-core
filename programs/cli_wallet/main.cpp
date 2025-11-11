@@ -351,15 +351,11 @@ int main( int argc, char** argv )
          if( cmd_pipe_read_fd != -1 && cmd_pipe_write_fd != -1 )
          {
             std::cout << "====== PIPE SETUP to receive cmd in wallet ====== \n"; 
+            // RPC pipe hooks:
             pipe_provider = std::make_shared<fc::rpc::cli_cmd_provider_pipe>(cmd_pipe_read_fd, cmd_pipe_write_fd);
             std::cout << "Using commands from pipe: " << pipe_provider->get_short_info() << std::endl;
-            
-            cmd_function = std::make_shared<fc::rpc::cli::t_cmd_provider>(
-               [pipe_provider]() -> std::string {
-                  return pipe_provider->read_command();
-               });
-            
-            wallet_cli->set_read_hook(std::weak_ptr<fc::rpc::cli::t_cmd_provider>(cmd_function));
+
+            wallet_cli->set_read_hook(std::weak_ptr<fc::rpc::cli::t_cmd_provider>(pipe_provider));
          }
 
          std::cout << "\nType \"help\" for a list of available commands.\n";

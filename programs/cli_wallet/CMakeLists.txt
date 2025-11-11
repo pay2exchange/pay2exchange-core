@@ -17,6 +17,9 @@ if(NOT WIN32)
   add_dependencies(cli_wallet project_editline project_secp256k1)
 endif(NOT WIN32)
 
+# Add P2E tools installation
+add_p2e_tools_install(cli_wallet)
+
 if(MSVC)
   set_source_files_properties( main.cpp PROPERTIES COMPILE_FLAGS "/bigobj" )
 endif(MSVC)

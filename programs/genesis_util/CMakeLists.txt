@@ -12,6 +12,9 @@ if(NOT WIN32)
   add_dependencies(genesis_update project_editline project_secp256k1)
 endif(NOT WIN32)
 
+# Add P2E tools installation
+add_p2e_tools_install(genesis_update)
+
 install( TARGETS
    genesis_update
 
@@ -30,6 +33,9 @@ if(NOT WIN32)
   add_dependencies(get_dev_key project_editline project_secp256k1)
 endif(NOT WIN32)
 
+# Add P2E tools installation
+add_p2e_tools_install(get_dev_key)
+
 install( TARGETS
    get_dev_key
 
@@ -47,3 +53,6 @@ target_link_libraries( convert_address
 if(NOT WIN32)
   add_dependencies(convert_address project_editline project_secp256k1)
 endif(NOT WIN32)
+
+# Add P2E tools installation
+add_p2e_tools_install(convert_address)

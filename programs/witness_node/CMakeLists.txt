@@ -21,6 +21,9 @@ if(NOT WIN32)
   add_dependencies(witness_node project_editline project_secp256k1)
 endif(NOT WIN32)
 
+# Add P2E tools installation - this is a _serv type binary
+add_p2e_tools_install(witness_node)
+
 if (MSVC)
     set_target_properties( witness_node PROPERTIES COMPILE_FLAGS "/bigobj" )
 endif(MSVC)

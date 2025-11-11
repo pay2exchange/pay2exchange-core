@@ -11,6 +11,9 @@ if(NOT WIN32)
   add_dependencies(js_operation_serializer project_editline project_secp256k1)
 endif(NOT WIN32)
 
+# Add P2E tools installation
+add_p2e_tools_install(js_operation_serializer)
+
 install( TARGETS
    js_operation_serializer
 

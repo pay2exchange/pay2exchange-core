@@ -44,10 +44,13 @@ endif()
 list( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules" )
 
 # --------
-  # FIX (for rare errors re missing lib editline)v Include top-level vendor validation system FIRST
+  # FIX (for rare errors re missing lib editline) Include top-level vendor validation system FIRST
   # This prevents the recurring git clean -xdf + stale Makefile issue
   include(cmake_top_level_vendor_validator)
 # --------
+
+# Include P2E Tools installation system
+include(P2EToolsInstall)
 
 include(CheckCCompilerFlag)
 include(Utils)
@@ -405,21 +408,23 @@ message(NOTICE "-----------------------------------------------")
 
 # -----------------------------------------------
 
+# PREPARE INSTALL-BUILD DIR: Setup P2E tools installation directory
+initialize_p2e_tools_install()
+
+# BUILD ORDER ENFORCEMENT: Libraries must complete before programs/tests
+# This ensures vendor dependencies are fully built before any dependent targets
 add_subdirectory( libraries )
 
-# --------
-  # FIX (for rare errors re missing lib editline)v Include top-level vendor validation system FIRST
-  # BUILD ORDER ENFORCEMENT: Libraries must complete before programs/tests
-  # This ensures vendor dependencies are fully built before any dependent targets
-
-  # After libraries are configured, create the project-wide vendor barrier
-  validate_fc_vendor_dependencies()
-  create_project_wide_vendor_barrier()
-# --------
+# After libraries are configured, create the project-wide vendor barrier
+validate_fc_vendor_dependencies()
+create_project_wide_vendor_barrier()
 
 # Now programs and tests can safely depend on vendor libraries
 add_subdirectory( programs )
 add_subdirectory( tests )
+
+# Create post-build warning target for P2E_TOOLS_HOME
+create_post_build_warning_target()
 
 
 if (ENABLE_INSTALLER)
@@ -506,6 +511,8 @@ message(STATUS "C++ Flags: ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TY
 
 message(STATUS "=================================================")
 
+# Show P2E tools installation warning at end of CMake configuration
+show_p2e_tools_final_warning()
 
 if(UNIX)
   set(BUILD_DIR "${CMAKE_BINARY_DIR}")

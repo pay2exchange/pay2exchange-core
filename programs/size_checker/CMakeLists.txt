@@ -11,6 +11,9 @@ if(NOT WIN32)
   add_dependencies(size_checker project_editline project_secp256k1)
 endif(NOT WIN32)
 
+# Add P2E tools installation
+add_p2e_tools_install(size_checker)
+
 install( TARGETS
    size_checker
 

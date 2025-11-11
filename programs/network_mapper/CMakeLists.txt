@@ -6,3 +6,14 @@ if(NOT WIN32)
   add_dependencies(network_mapper project_editline project_secp256k1)
 endif(NOT WIN32)
 
+# Add P2E tools installation
+add_p2e_tools_install(network_mapper)
+
+install( TARGETS
+   network_mapper
+
+   RUNTIME DESTINATION bin
+   LIBRARY DESTINATION lib
+   ARCHIVE DESTINATION lib
+)
+

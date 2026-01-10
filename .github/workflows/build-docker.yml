@@ -1,5 +1,5 @@
 name: Docker
-on: [push]
+on: [push, workflow_dispatch]
 jobs:
   docker:
     permissions: write-all

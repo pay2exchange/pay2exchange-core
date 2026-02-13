@@ -126,6 +126,13 @@ void application_impl::reset_p2p_node(const fc::path& data_dir)
    _p2p_network->load_configuration(data_dir / "p2p");
    _p2p_network->set_node_delegate(shared_from_this());
 
+   // Set TCP socket reuse option if specified
+   if( _options->count("net-reuse") > 0 )
+   {
+      bool enable_reuse = _options->at("net-reuse").as<bool>();
+      _p2p_network->set_tcp_socket_reuse(enable_reuse);
+   }
+
    if( _options->count("seed-node") > 0 )
    {
       auto seeds = _options->at("seed-node").as<vector<string>>();
@@ -1349,6 +1356,8 @@ void application::set_program_options(boost::program_options::options_descriptio
          ("force-validate", "Force validation of all transactions during normal operation")
          ("genesis-timestamp", bpo::value<uint32_t>(),
           "Replace timestamp from genesis.json with current time plus this many seconds (experts only!)")
+         ("net-reuse", bpo::value<bool>()->implicit_value(true)->default_value(false),
+          "Enable TCP socket reuse (SO_REUSEADDR/SO_REUSEPORT) on P2P listening socket")
          ;
    command_line_options.add(_cli_options);
    configuration_file_options.add(_cfg_options);

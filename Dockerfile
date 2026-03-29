@@ -1,5 +1,6 @@
 # The image for building
-FROM linuxpatch/ubuntu:24.04 as build
+FROM linuxpatch/ubuntu:24.04 AS build
+ENV LC_ALL=en_US.UTF-8
 ENV LANG=en_US.UTF-8
 
 # Install dependencies
@@ -33,24 +34,32 @@ RUN \
       libtool \
       doxygen \
       ca-certificates \
+      pkg-config \
+      locales \
+      sccache \
     && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN locale-gen en_US.UTF-8
+RUN update-locale LANG=en_US.UTF-8
 
+# WORKDIR /root
 ADD . /bitshares-core
 WORKDIR /bitshares-core
-
-# Compile
-RUN git submodule update --init --recursive
-RUN cmake \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DGRAPHENE_DISABLE_UNITY_BUILD=ON .
-
-RUN make witness_node cli_wallet get_dev_key
-RUN install -s programs/witness_node/witness_node \
-    programs/genesis_util/get_dev_key \
-    programs/cli_wallet/cli_wallet \
-    /usr/local/bin
+ENV SCCACHE_DIRECT="on"
+RUN --mount=type=bind,target=/sccache,source=/home/runner/.cache/sccache \
+    SCCACHE_DIR=/sccache \
+    git submodule update --init --recursive && \
+    cmake \
+      -DCMAKE_C_COMPILER_LAUNCHER=sccache \
+      -DCMAKE_CXX_COMPILER_LAUNCHER=sccache \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DGRAPHENE_DISABLE_UNITY_BUILD=ON . && \
+    make witness_node cli_wallet get_dev_key && \
+    install -s programs/witness_node/witness_node \
+      programs/genesis_util/get_dev_key \
+      programs/cli_wallet/cli_wallet \
+      /usr/local/bin
 
 # Obtain version
 RUN mkdir -p /etc/bitshares
@@ -60,7 +69,7 @@ RUN cd / && rm -rf /bitshares-core
 # The final image
 FROM linuxpatch/ubuntu:24.04
 LABEL maintainer="The pay2exchange decentralized organisation"
-ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
 
 # Install required libraries
 RUN \
@@ -81,7 +90,7 @@ COPY --from=build /etc/bitshares/version /etc/bitshares/
 WORKDIR /
 RUN groupadd -g 10001 bitshares
 RUN useradd -u 10000 -g bitshares -s /bin/bash -m -d /var/lib/bitshares --no-log-init bitshares
-ENV HOME /var/lib/bitshares
+ENV HOME=/var/lib/bitshares
 RUN chown bitshares:bitshares -R /var/lib/bitshares
 
 # default exec/config files
